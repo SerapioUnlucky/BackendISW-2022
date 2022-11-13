@@ -85,6 +85,20 @@ const deleteReservations = (req, res) => {
     //Recoger datos del body
     const {mes, año} = req.body;
 
+    if(!mes){
+        return res.status(406).json({
+            status:"error",
+            message:"Por favor ingrese un mes"
+        })
+    }
+
+    if(!año){
+        return res.status(406).json({
+            status:"error",
+            message:"Por favor ingrese un año"
+        })
+    }
+
     //Se obtiene el mes, año, dia y hora actual
     let fecha = new Date;
     let mesActual = fecha.getMonth()+1;

@@ -18,6 +18,20 @@ const enviarAvisoMantencion = (req, res) => {
         });
     }
 
+    if(!message){
+        return res.status(406).json({
+            status:"error",
+            message:"Por favor ingrese un mensaje a notificar"
+        })
+    }
+
+    if(message.length < 10 || message.length > 100){
+        return res.status(406).json({
+            status:"error",
+            message:"La cantidad de caracteres no es válida"
+        })
+    }
+
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
