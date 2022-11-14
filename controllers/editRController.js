@@ -25,7 +25,6 @@ const editR = (req, res) => {
     let hra = fecha.getHours();
 
     //Validacion de datos ingresados cumplan con rango del mes actual.
-
     //VALIDACION AÑO
     if (anio != year) {
         return res.status(406).send({ message: "El año ingresado es inválido" })

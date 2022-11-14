@@ -159,6 +159,8 @@ const crearReservacion = (req, res) => {
      
 }
 
+//Listo
+//Requerimiento de Claudia Villagrán
 const deleteSpecificReserva = (req, res) =>{
 
     const { id } = req.params
@@ -203,7 +205,7 @@ const deleteSpecificReserva = (req, res) =>{
 
     });
 
- }
+}
 
 module.exports = {
     crearReservacion,
