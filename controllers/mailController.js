@@ -25,7 +25,7 @@ const enviarAvisoMantencion = (req, res) => {
         })
     }
 
-    if(message.length < 10 || message.length > 100){
+    if(message.length < 10 || message.length > 400){
         return res.status(406).json({
             status:"error",
             message:"La cantidad de caracteres no es válida"
