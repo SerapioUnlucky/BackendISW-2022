@@ -41,7 +41,7 @@ const editR = (req, res) => {
     }
 
     //VALIDACION HORA
-    if (hra < hora) {
+    if ( dia == day || hra <= hora) {
         return res.status(406).send({ message: "La hora ingresada es inválida" })
     }
 
