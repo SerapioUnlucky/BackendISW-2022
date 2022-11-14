@@ -51,7 +51,7 @@ const createUsers = (req, res) => {
     if(params.rut < 30000000 || params.rut > 250000000){
         return res.status(406).json({
             status: "error",
-            message: "El RUT ingresado con el válido"
+            message: "El RUT ingresado no es el válido"
         })
     }
 
@@ -72,14 +72,14 @@ const createUsers = (req, res) => {
     if(!validacionFechaNacimiento.test(params.fechaNacimiento)){
         return res.status(406).json({
             status:"error",
-            message: "No se aceptan fechas en ese formato"
+            message: "La fecha ingresada no es válida, solo se acepta el formato de YYYY-mm-dd"
         })
     }
 
-    if(params.contraseña.length < 8){
+    if(params.contraseña.length < 9){
         return res.status(406).json({
             status: "error",
-            message: "La contraseña es demasiado corta"
+            message: "La contraseña ingresada no es válida, el número de caracteres mínimo es de 8"
         })
     }
 
@@ -90,10 +90,10 @@ const createUsers = (req, res) => {
         });
     }
 
-    if(params.telefono.toString().length != 9){
+    if(params.telefono.toString().length != 8){
         return res.status(406).json({
             status: "error",
-            message: "El número de teléfono no es válido"
+            message: "El número de teléfono no es válido, solo se acepta el formato de +569-xxxxxxxx"
         })
     }
     
