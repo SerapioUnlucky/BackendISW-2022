@@ -159,6 +159,53 @@ const crearReservacion = (req, res) => {
      
 }
 
+const deleteSpecificReserva = (req, res) =>{
+
+    const { id } = req.params
+
+    let fecha=new Date();
+    let dia = fecha.getDate();
+    let mes= fecha.getMonth()+1;
+    let year=fecha.getFullYear();
+    let hora=fecha.getHours();
+
+    reserva.findById(id,(err,reserv) => {
+
+        if(reserv.year!=year){
+            return res.status(404).send({ message: "Año fuera de limite"})
+        }
+
+        if(reserv.month<mes){
+            return res.status(404).send({ message: "Mes fuera de limites"})
+        }
+
+        if(reserv.day<dia){
+            return res.status(404).send({ message: "Dia fuera de limites"})
+        }
+
+        if((reserv.day==dia && reserv.hora<hora) ){
+            return res.status(404).send({ message: "Hora fuera de limites"})
+        }
+
+        reserva.findByIdAndDelete(id, (err, reserv) => {
+
+            if(err){
+            return res.status(400).send({ message: "Error al obtener la reserva"})
+            }
+
+            if (!reserv) {
+            return res.status(404).send({ message: "No existe la reserva"})
+            }
+            
+            return res.status(200).send({ message: "Se elimino la reserva de forma correcta",reserva: reserv})
+
+        });
+
+    });
+
+ }
+
 module.exports = {
-    crearReservacion
+    crearReservacion,
+    deleteSpecificReserva
 }
