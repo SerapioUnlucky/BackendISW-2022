@@ -9,6 +9,14 @@ const crearReservacion = (req, res) => {
     //Se recogen los datos del body
     const {usuario,year,month,day,tipo,hora} = req.body;
 
+    //Validacion de si llegan datos
+    if(!usuario || !year || !month || !day || !tipo || !hora){
+        return res.status(406).json({
+            status:"error",
+            message:"Faltan datos por enviar"
+        });
+    }
+
     //Se obtiene el mes, año, dia y hora actual
     let fecha = new Date();
     let mesActual = fecha.getMonth()+1;

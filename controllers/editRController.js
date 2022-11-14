@@ -9,8 +9,16 @@ const editR = (req, res) => {
     //DECLARACIONES DE VARIABLES
     const { id } = req.params;
     const { usuario, year, month, day, hora, tipo } = req.body
-    const fecha = new Date();
 
+    //Validacion de si llegan datos
+    if(!usuario || !year || !month || !day || !hora || !tipo){
+        return res.status(406).json({
+            status:"error",
+            message:"Faltan datos por enviar"
+        });
+    }
+
+    const fecha = new Date();
     let anio = fecha.getFullYear();
     let mes = fecha.getMonth() + 1;
     let dia = fecha.getDate();
