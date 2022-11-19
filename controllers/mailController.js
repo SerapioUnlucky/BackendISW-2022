@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
-const Users = require("../models/usersModel");
+const Users = require("../models/userModel");
 dotenv.config();
 
 //Listo

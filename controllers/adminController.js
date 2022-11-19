@@ -1,6 +1,5 @@
 const Admin = require("../models/adminModel");
-const Users = require("../models/usersModel");
-const Reservas = require("../models/reserva");
+const Reservas = require("../models/reservaModel");
 const bcrypt = require("bcrypt");
 const jwt = require("../services/jwtAdmin");
 
@@ -57,114 +56,6 @@ const login = (req, res) => {
 
 }
 
-//Listo
-const viewProfiles = (req, res) => {
-
-    Users.find((error, users) => {
-
-        if(error || !users){
-            return res.status(400).json({
-                status: "error",
-                message: "No hay usuarios para mostrar"
-            })
-        }
-
-        return res.status(200).json({
-            status: "success",
-            users
-        });
-
-    })
-
-}
-
-//Listo
-//Requerimiento de Sebastian Jerez
-const deleteReservations = (req, res) => {
-
-    //Recoger datos del body
-    const {mes, año} = req.body;
-
-    if(!mes){
-        return res.status(406).json({
-            status:"error",
-            message:"Por favor ingrese un mes"
-        })
-    }
-
-    if(!año){
-        return res.status(406).json({
-            status:"error",
-            message:"Por favor ingrese un año"
-        })
-    }
-
-    //Se obtiene el mes, año, dia y hora actual
-    let fecha = new Date;
-    let mesActual = fecha.getMonth()+1;
-    let anioActual = fecha.getFullYear();
-
-    if(mes >= mesActual){
-        return res.status(400).json({
-            status: "error",
-            message: "El mes ingresado no puede ser mayor o igual al mes actual"
-        });
-    }
-
-    if(año > anioActual){
-        return res.status(400).json({
-            status: "error",
-            message: "El año ingresado no puede ser mayor"
-        })
-    }
- 
-    //Buscar las reservas mediante los parametros que nos entrego el body
-    Reservas.find({month:mes, year:año},(error, reservations) => {
-
-        if(error){
-            return res.status(400).json({
-                status:"error",
-                message: "Hubo un error en la consulta"
-            })
-        }
-
-        if(reservations.length == 0){
-            return res.status(404).json({
-                status:"error",
-                message: "No hay reservas que eliminar"
-            })
-        }
-
-        //Recorrer el objeto del resultado de la busqueda anterior
-        reservations.map(reservation => {
-
-            //Eliminar las reservas
-            reservation.delete((error, eliminacion) => {
-
-                //En caso de error
-                if(error){
-                    return res.status(404).json({
-                        status:"error",
-                        message: "Ha ocurrido un problema con la eliminación"
-                    });
-                }
-                
-            });
-
-        });
-
-        //Devolver resultado de exito
-        return res.status(200).json({
-            status:"success",
-            message: "Se han eliminado las reservas"
-        });
-
-    })   
-
-}
-
 module.exports = {
-    login,
-    viewProfiles,
-    deleteReservations
+    login
 }

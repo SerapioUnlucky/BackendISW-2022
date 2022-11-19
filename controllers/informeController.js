@@ -1,5 +1,5 @@
-const reserva = require('../models/reserva')
-const usuario = require('../models/usersModel')
+const reserva = require('../models/reservaModel')
+const usuario = require('../models/userModel')
 
 //Listo
 //Requerimiento de Samuel Sanhueza

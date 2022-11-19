@@ -8,26 +8,16 @@ app.use(cors());
 app.use(express.json());
 app.options('*', cors());
 
-const rutas_users = require("./routes/usersRoute");
+const rutas_user = require("./routes/userRoute");
 const rutas_admin = require("./routes/adminRoute");
 const rutas_mail = require("./routes/mailRoute");
-
-//Rutas de Samuel
-const rutas_reservar = require("./routes/reservarRoutes");
+const rutas_reserva = require("./routes/reservaRoutes");
 const rutas_informe = require("./routes/informeRoutes");
 
-//Rutas Marcelo
-const rutas_modificar = require("./routes/editRRoute");
-
-app.use("/api", rutas_users);
+app.use("/api", rutas_user);
 app.use("/api", rutas_admin);
 app.use("/api", rutas_mail);
-
-//Marcelo
-app.use("/api", rutas_modificar);
-
-//Samuel
-app.use("/api", rutas_reservar);
+app.use("/api", rutas_reserva);
 app.use("/api", rutas_informe);
 
 const options = {

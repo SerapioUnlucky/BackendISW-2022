@@ -1,12 +1,12 @@
-const Users = require("../models/usersModel");
-const Reservas = require("../models/reserva");
+const User = require("../models/userModel");
+const Reserva = require("../models/reservaModel");
 const bcrypt = require("bcrypt");
 const jwt = require("../services/jwtUsers");
 const fs = require("fs");
 const path = require("path");
 
 //Listo
-const createUsers = (req, res) => {
+const createUser = (req, res) => {
 
     //Recoger datos
     let params = req.body;
@@ -27,7 +27,7 @@ const createUsers = (req, res) => {
     }
 
     //Validacion de expresiones regulares (En proceso...)
-    if(!validacionSoloLetras.test(params.nombre)){
+    /*if(!validacionSoloLetras.test(params.nombre)){
         return res.status(406).json({
             status: "error",
             message: "El nombre es incorrecto, solo se aceptan letras"
@@ -95,13 +95,13 @@ const createUsers = (req, res) => {
             status: "error",
             message: "El número de teléfono no es válido, solo se acepta el formato de +569-xxxxxxxx"
         })
-    }
+    }*/
     
     //Crear objeto de usuario
-    let user = new Users(params);
+    let user = new User(params);
 
     //Control de usuarios duplicados
-    Users.find({ $or: [
+    User.find({ $or: [
 
         {rut: user.rut},
         {email: user.email},
@@ -175,7 +175,7 @@ const login = (req, res) => {
     }
 
     //Buscar en la BD si existe
-    Users.findOne({email: params.email})
+    User.findOne({email: params.email})
         .exec((error, user) => {
 
         if(error || !user){
@@ -192,7 +192,7 @@ const login = (req, res) => {
             return res.status(400).json({
                 status:"error",
                 message:"Contraseña incorrecta por favor inténtelo nuevamente"
-            })
+            });
         }
 
         //Devolver token
@@ -221,7 +221,7 @@ const viewprofile = (req, res) => {
     const id = req.params.id;
 
     //Consulta para sacar los datos del usuario
-    Users.findById(id)
+    User.findById(id)
         .select({contraseña: 0})
         .exec((error, userProfile) => {
 
@@ -240,6 +240,65 @@ const viewprofile = (req, res) => {
         });
 
     })
+
+}
+
+//Listo
+const viewProfiles = (req, res) => {
+
+    User.find()
+        .select({contraseña: 0})
+        .exec((error, users) => {
+
+        if(error || !users){
+            return res.status(404).send({
+                status: "error",
+                message: "No hay usuarios para mostrar"
+            });
+        }
+
+        return res.status(200).send({
+            status: "success",
+            users: users
+        })
+
+    })
+
+}
+
+//Listo
+const deleteUser = (req, res) => {
+
+    let id = req.params.id;
+
+    Reserva.find((error, reservas) => {
+
+        if(reservas.length >= 1){
+
+            return res.status(400).send({
+                status: "error",
+                message: "El usuario tiene reservas registradas, no puede ser eliminado"
+            });
+
+        }
+
+        User.findByIdAndDelete(id, (error, reserva) => {
+
+            if(error){
+                return res.status(400).send({
+                    status: "error",
+                    message: "Ha ocurrido un error al eliminar el usuario intentelo nuevamente"
+                });
+            }
+
+            return res.status(200).send({
+                status: "success",
+                message: "El usuario se ha eliminado con exito"
+            });
+
+        });
+
+    });
 
 }
 
@@ -284,7 +343,7 @@ const subirImagen = (req, res) => {
         let user_id = req.params.id;
 
         //Buscar y actualizar articulo
-        Users.findOneAndUpdate({_id: user_id}, {imagen: req.file.filename}, {new: true},(error, userActualizado) => {
+        User.findOneAndUpdate({_id: user_id}, {imagen: req.file.filename}, {new: true},(error, userActualizado) => {
 
             //En caso de error
             if(error || !userActualizado){
@@ -325,38 +384,12 @@ const conseguirImagen = (req, res) => {
 
 }
 
-//Listo
-const verReservas = (req, res) => {
-
-    //Recibir el parametro del id de usuario por la url
-    const id = req.params.id;
-
-    //Consulta para sacar los datos del usuario
-    Reservas.find({usuario:id})
-        .exec((error, reservasUser) => {
-
-        //Devolver resultado si usuario no existe
-        if(error || !reservasUser){
-            return res.status(404).json({
-                status: "error",
-                message: "No hay reservas"
-            });
-        }
-
-        //Devolver el resultado
-        return res.status(200).json({
-            status: "success",
-            reservas: reservasUser
-        });
-
-    })
-}
-
 module.exports = {
-    createUsers,
+    createUser,
     login,
     viewprofile,
+    viewProfiles,
+    deleteUser,
     subirImagen,
-    conseguirImagen,
-    verReservas
+    conseguirImagen
 }
