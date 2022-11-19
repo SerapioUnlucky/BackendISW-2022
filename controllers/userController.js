@@ -6,17 +6,17 @@ const fs = require("fs");
 const path = require("path");
 
 //Listo
+//Funcionalidad de registrar usuarios al sistema
 const createUser = (req, res) => {
 
     //Recoger datos
     let params = req.body;
 
-    //Validaciones (En proceso...)
+    //Validaciones
     const validacionSoloLetras = /^[a-zA-Z]+$/;
     const validacionSoloNumeros = /^[0-9]+$/;
-    const validacionLetrasNumeros = /^[A-Za-z0-9]+\s[A-Za-z0-9]+\s[0-9]+$/;
     const validacionFechaNacimiento = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
-    const validacionGmail = /^[A-Za-z0-9]+@gmail\.com$/;
+    const validacionCorreo = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/; 
 
     //Validar si llegan los datos
     if(!params.nombre || !params.apellido || !params.rut || !params.email || !params.direccion || !params.fechaNacimiento || !params.contraseña || !params.telefono){
@@ -27,7 +27,7 @@ const createUser = (req, res) => {
     }
 
     //Validacion de expresiones regulares (En proceso...)
-    /*if(!validacionSoloLetras.test(params.nombre)){
+    if(!validacionSoloLetras.test(params.nombre)){
         return res.status(406).json({
             status: "error",
             message: "El nombre es incorrecto, solo se aceptan letras"
@@ -55,25 +55,18 @@ const createUser = (req, res) => {
         })
     }
 
-    if(!validacionGmail.test(params.email)){
-        return res.status(406).json({
-            status: "error",
-            message: "El email es incorrecto, solo se aceptan emails con dominio de Gmail"
-        });
-    }
-
-    if(!validacionLetrasNumeros.test(params.direccion)){
-        return res.status(406).json({
-            status: "error",
-            message: "La dirección no es válida, solo se aceptan letras y números"
-        })
-    }
-
     if(!validacionFechaNacimiento.test(params.fechaNacimiento)){
         return res.status(406).json({
             status:"error",
             message: "La fecha ingresada no es válida, solo se acepta el formato de YYYY-mm-dd"
         })
+    }
+
+    if(!validacionCorreo.test(params.email)){
+        return res.status(406).send({
+            status: "error",
+            message: "El correo ingresado no es válido"
+        });
     }
 
     if(params.contraseña.length < 9){
@@ -95,7 +88,7 @@ const createUser = (req, res) => {
             status: "error",
             message: "El número de teléfono no es válido, solo se acepta el formato de +569-xxxxxxxx"
         })
-    }*/
+    }
     
     //Crear objeto de usuario
     let user = new User(params);
@@ -161,6 +154,32 @@ const createUser = (req, res) => {
 }
 
 //Listo
+//Funcionalidad para el admin de modificar la autorizacion a los usuarios
+const updateAuthorization = (req, res) => {
+
+    let id = req.params.id;
+
+    User.findByIdAndUpdate(id, req.body, (error, user) => {
+
+        if(error){
+            return res.status(400).send({
+                status: "error",
+                message: "Ha ocurrido un error al actualizar autorizacion"
+            });
+        }
+
+        return res.status(200).send({
+            status: "success",
+            message: "Se ha actualizado la autorizacion",
+            user: user
+        });
+
+    });
+
+}
+
+//Listo
+//Funcionalidad de logearse como usuario
 const login = (req, res) => {
 
     //Recoger parametros
@@ -215,6 +234,7 @@ const login = (req, res) => {
 }
 
 //Listo
+//Funcionalidad de ver que cada usuario vea su perfil
 const viewprofile = (req, res) => {
 
     //Recibir el parametro del id de usuario por la url
@@ -244,6 +264,7 @@ const viewprofile = (req, res) => {
 }
 
 //Listo
+//Funcionalidad para el admin para que pueda ver todos los usuarios registrados en el sistema
 const viewProfiles = (req, res) => {
 
     User.find()
@@ -267,6 +288,7 @@ const viewProfiles = (req, res) => {
 }
 
 //Listo
+//Funcionalidad de eliminar la cuenta de un usuario
 const deleteUser = (req, res) => {
 
     let id = req.params.id;
@@ -303,6 +325,7 @@ const deleteUser = (req, res) => {
 }
 
 //Listo
+//Funcionalidad de subir una imagen para un usuario
 const subirImagen = (req, res) => {
 
     //Recoger el fichero de imagen subido
@@ -366,6 +389,7 @@ const subirImagen = (req, res) => {
 }
 
 //Listo
+//Funcionalidad para ver una imagen
 const conseguirImagen = (req, res) => {
 
     let fichero = req.params.fichero;
@@ -386,6 +410,7 @@ const conseguirImagen = (req, res) => {
 
 module.exports = {
     createUser,
+    updateAuthorization,
     login,
     viewprofile,
     viewProfiles,

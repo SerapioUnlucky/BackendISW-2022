@@ -16,8 +16,16 @@ const createReservation = (req, res) => {
         });
     }
 
+    //Validacion de fechas validas
     let date = new Date(params.fechaReserva);
     let dateNow = new Date();
+
+    if(date.getHours() < 8 || date.getHours() > 21){
+        return res.status(406).send({
+            status: "error",
+            message: "La hora ingresada no es valida"
+        });
+    }
 
     if(date.getTime() <= dateNow.getTime()){
         return res.status(406).send({
@@ -107,8 +115,16 @@ const updateReservation = (req, res) => {
         });
     }
 
+    //Validacion de fechas validas
     let date = new Date(params.fechaReserva);
     let dateNow = new Date();
+
+    if(date.getHours() < 8 || date.getHours() > 21){
+        return res.status(406).send({
+            status: "error",
+            message: "La hora ingresada no es valida"
+        });
+    }
 
     if(date.getTime() <= dateNow.getTime()){
         return res.status(406).send({
@@ -122,7 +138,7 @@ const updateReservation = (req, res) => {
         if (user.autorizado == "No") {
             return res.status(400).send({
                 status: "error",
-                message: "No tiene permisos para realizar esta accion"
+                message: "No tiene permisos para modificar esta reserva"
             });
         }
 
@@ -153,7 +169,7 @@ const updateReservation = (req, res) => {
                 from: "Administración <" + mail + ">",
                 to: user.email,
                 subject: "Modificacion de reserva",
-                html: "<h3>" + message + params.day + "/" + params.month + "/" + params.year + " a las " + params.hora + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
+                html: "<h3>" + message + params.fechaReserva + " horas" +", el tipo de servicio a usar es " + params.tipo + "</h3>"
             }
 
             transporter.sendMail(mailOptions);
@@ -245,7 +261,7 @@ const viewReservations = (req, res) => {
 const viewAllReservations = (req, res) => {
 
     Reserva.find((error, reservations) => {
-        if(error){
+        if(error || !reservations){
             return res.status(400).send({
                 status: "error",
                 message: "No se han encontrado reservas"
