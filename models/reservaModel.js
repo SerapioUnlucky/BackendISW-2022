@@ -15,6 +15,9 @@ const reservaSchema = new Schema({
         enum: ['Lavadora','Secadora'],
         required: true
     }
+},
+{
+    timestamps:true
 })
 
 module.exports = mongoose.model('reserva', reservaSchema);

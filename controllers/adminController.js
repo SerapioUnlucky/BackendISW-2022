@@ -1,5 +1,4 @@
 const Admin = require("../models/adminModel");
-const Reservas = require("../models/reservaModel");
 const bcrypt = require("bcrypt");
 const jwt = require("../services/jwtAdmin");
 

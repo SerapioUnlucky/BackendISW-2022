@@ -12,11 +12,17 @@ const rutas_user = require("./routes/userRoute");
 const rutas_admin = require("./routes/adminRoute");
 const rutas_mail = require("./routes/mailRoute");
 const rutas_reserva = require("./routes/reservaRoutes");
+const rutas_mantencion = require("./routes/mantencionRoutes");
+const rutas_maquina = require("./routes/maquinaRoutes");
+const ruta_informe = require("./routes/micelaneoRoutes");
 
 app.use("/api", rutas_user);
 app.use("/api", rutas_admin);
 app.use("/api", rutas_mail);
 app.use("/api", rutas_reserva);
+app.use("/api", rutas_mantencion);
+app.use("/api", rutas_maquina);
+app.use("/api", ruta_informe);
 
 const options = {
     useNewUrlParser: true,
