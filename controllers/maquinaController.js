@@ -58,6 +58,13 @@ const eliminarMaquina = (req, res) => {
     //Buscar el tipo de maquina que se quiere eliminar
     maquina.findById(id, (error, tipoMaquina) => {
 
+        if(!tipoMaquina){
+            return res.status(406).send({
+                status: "error",
+                message: "No hay maquina que eliminar"
+            });
+        }
+
         //Buscar cuantas reservas estan con esa maquina en concreto
         reserva.find({tipo: tipoMaquina.tipo}, (error, reservaMaquinas) => {
 
@@ -79,13 +86,6 @@ const eliminarMaquina = (req, res) => {
                     if(error){
                         return res.status(400).send({
                             message: "Hubo un error al eliminar la maquina"
-                        });
-                    }
-
-                    if(!maquina){
-                        return res.status(406).send({
-                            status: "error",
-                            message: "No hay maquina que eliminar"
                         });
                     }
             

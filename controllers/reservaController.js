@@ -76,6 +76,14 @@ const createReservation = (req, res) => {
                                 message: "No tiene permisos para realizar reservas"
                             });
                         }
+
+                        //En caso de que el usuario ingresado no exista
+                        if(!user){
+                            return res.status(406).send({
+                                status: "error",
+                                message: "El usuario ingresado no existe"
+                            });
+                        }
             
                         //Crear objeto para guardar en la bd
                         let reserva_to_save = new Reserva(params);
@@ -212,6 +220,14 @@ const updateReservation = (req, res) => {
                             return res.status(400).send({
                                 status: "error",
                                 message: "No tiene permisos para modificar esta reserva"
+                            });
+                        }
+
+                        //En caso de que el usuario ingresado no exista
+                        if(!user){
+                            return res.status(406).send({
+                                status: "error",
+                                message: "El usuario ingresado no existe"
                             });
                         }
                 
