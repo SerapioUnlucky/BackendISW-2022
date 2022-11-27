@@ -40,8 +40,16 @@ const createReservation = (req, res) => {
     //Buscar en el modelo de reserva por la id de usuario y fecha ingresada 
     Reserva.find({ usuario: params.usuario, fechaReserva: params.fechaReserva }, (error, reserva) => {
 
+        //En caso que el usuario ingresado no exista
+        if(!reserva){
+            return res.status(406).send({
+                status: "error",
+                message: "El usuario ingresado no existe"
+            });
+        }
+
         //Si el usuario quiere registrar una reserva donde ya tiene registrada una reserva se activara esta validacion
-        if (reserva.length == 1) {
+        if (reserva.length === 1) {
 
             return res.status(400).send({
                 status: "error",
@@ -74,14 +82,6 @@ const createReservation = (req, res) => {
                             return res.status(400).send({
                                 status: "error",
                                 message: "No tiene permisos para realizar reservas"
-                            });
-                        }
-
-                        //En caso de que el usuario ingresado no exista
-                        if(!user){
-                            return res.status(406).send({
-                                status: "error",
-                                message: "El usuario ingresado no existe"
                             });
                         }
             
@@ -185,6 +185,14 @@ const updateReservation = (req, res) => {
 
     //Buscar en el modelo de reserva por la id de usuario y fecha ingresada 
     Reserva.find({ usuario: params.usuario, fechaReserva: params.fechaReserva }, (error, reserva) => {
+
+        //En caso que el usuario ingresado no exista
+        if(!reserva){
+            return res.status(406).send({
+                status: "error",
+                message: "El usuario ingresado no existe"
+            });
+        }
 
         //Si el usuario registra una reserva donde ya tiene registrada una reserva se activara esta validacion
         if (reserva.length === 1) {
