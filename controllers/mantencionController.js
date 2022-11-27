@@ -5,6 +5,7 @@ const reserva = require('../models/reservaModel');
 const User = require("../models/userModel");
 const nodemailer = require("nodemailer");
 
+//Listo
 const crearMantencion = async (req, res) => {
     const { fechaIni, fechaFin, maquinaid } = req.body;
 
@@ -122,6 +123,7 @@ const crearMantencion = async (req, res) => {
     }
 }
 
+//Listo
 const eliminarMantencion = (req, res) => {
 
     let id = req.params.id;
@@ -136,6 +138,7 @@ const eliminarMantencion = (req, res) => {
 
 }
 
+//Pendiente
 const modificarMantencion = async (req, res) => {
     
     const { id, fechaIni, fechaFin, maquinaid } = req.body;
@@ -145,11 +148,11 @@ const modificarMantencion = async (req, res) => {
     fechaInicio.setHours(0, 0, 0, 0)
     fechaFinal.setHours(0, 0, 0, 0)
 
-    if (fechaInicio.getTime() < fechaFinal.getTime()) {
-        return res.status(400).send({
-            message: "la fecha de inicio no puede ser menor a la fecha final"
-        })
-    }
+    // if (fechaInicio.getTime() < fechaFinal.getTime()) {
+    //     return res.status(400).send({
+    //         message: "la fecha de inicio no puede ser menor a la fecha final"
+    //     })
+    // }
 
     await mantencion.findByIdAndUpdate(id, { fechaIni: fechaInicio, fechaFin: fechaFinal, maquinaid: maquinaid }, function (err, data) {
         if (err) {
@@ -243,6 +246,7 @@ const modificarMantencion = async (req, res) => {
 
 }
 
+//Listo
 const obtenerMantenciones = (req, res) => {
 
     mantencion.find({}, function (err, data) {
@@ -258,6 +262,7 @@ const obtenerMantenciones = (req, res) => {
     })
 }
 
+//Listo
 const obtenerMantencion = (req, res) => {
 
     let id = req.params.id;
@@ -274,7 +279,7 @@ const obtenerMantencion = (req, res) => {
         }
     })
 }
-
+ 
 module.exports = {
     crearMantencion,
     eliminarMantencion,

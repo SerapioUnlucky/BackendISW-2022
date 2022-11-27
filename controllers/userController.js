@@ -5,8 +5,7 @@ const jwt = require("../services/jwtUsers");
 const fs = require("fs");
 const path = require("path");
 
-//Listo
-//Funcionalidad de registrar usuarios al sistema
+//Listo (usuario)
 const createUser = (req, res) => {
 
     //Recoger datos
@@ -26,7 +25,7 @@ const createUser = (req, res) => {
         });
     }
 
-    //Validacion de expresiones regulares (En proceso...)
+    //Validacion de solo letras en el nombre del usuario
     if(!validacionSoloLetras.test(params.nombre)){
         return res.status(406).json({
             status: "error",
@@ -34,6 +33,7 @@ const createUser = (req, res) => {
         });
     }
 
+    //Validacion de solo letras en el apellido del usuario
     if(!validacionSoloLetras.test(params.apellido)){
         return res.status(406).json({
             status: "error",
@@ -41,6 +41,7 @@ const createUser = (req, res) => {
         })
     }
 
+    //Validacion de solo numeros en el rut
     if(!validacionSoloNumeros.test(params.rut)){
         return res.status(406).json({
             status: "error",
@@ -48,6 +49,7 @@ const createUser = (req, res) => {
         })
     }
 
+    //Validacion de ingresar un rut correcto
     if(params.rut < 30000000 || params.rut > 250000000){
         return res.status(406).json({
             status: "error",
@@ -55,6 +57,7 @@ const createUser = (req, res) => {
         })
     }
 
+    //Validacion del formato de ingreso de la fecha
     if(!validacionFechaNacimiento.test(params.fechaNacimiento)){
         return res.status(406).json({
             status:"error",
@@ -62,6 +65,7 @@ const createUser = (req, res) => {
         })
     }
 
+    //Validacion del email
     if(!validacionCorreo.test(params.email)){
         return res.status(406).send({
             status: "error",
@@ -69,6 +73,7 @@ const createUser = (req, res) => {
         });
     }
 
+    //Validacion del largo de la contraseña
     if(params.contraseña.length < 9){
         return res.status(406).json({
             status: "error",
@@ -76,6 +81,7 @@ const createUser = (req, res) => {
         })
     }
 
+    //Validacion de solo numeros en el telefono de contacto
     if(!validacionSoloNumeros.test(params.telefono)){
         return res.status(406).json({
             status: "error",
@@ -83,6 +89,7 @@ const createUser = (req, res) => {
         });
     }
 
+    //Validacion del largo del numero de contacto
     if(params.telefono.toString().length != 8){
         return res.status(406).json({
             status: "error",
@@ -102,6 +109,7 @@ const createUser = (req, res) => {
 
     ]}).exec((error, users) => {
 
+        //En caso de error
         if(error){
             return res.status(500).json({
                 status: "error",
@@ -109,6 +117,7 @@ const createUser = (req, res) => {
             });
         }
 
+        //En caso de que el usuario ya este registrado en la bd
         if(users && users.length >= 1){
             return res.status(400).json({
                 status: "error",
@@ -119,6 +128,7 @@ const createUser = (req, res) => {
         //Cifrar la contraseña
         bcrypt.hash(user.contraseña, 10, (error, pwd) => {
 
+            //En caso de error
             if(error){
                 return res.status(500).json({
                     status: "error",
@@ -126,11 +136,13 @@ const createUser = (req, res) => {
                 });
             }
 
+            //Contraseña cifrada
             user.contraseña = pwd;
 
             //Guardar datos en la BD
             user.save((error, userSave) => {
 
+                //En caso de error
                 if(error){
                     return res.status(500).json({
                         status: "error",
@@ -153,14 +165,16 @@ const createUser = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad para el admin de modificar la autorizacion a los usuarios
+//Listo (admin)
 const updateAuthorization = (req, res) => {
 
+    //Se recoge id del usuario por url 
     let id = req.params.id;
 
+    //Se obtiene el usuario mediante la id ingresada y se modifica su autorizacion
     User.findByIdAndUpdate(id, req.body, (error, user) => {
 
+        //En caso de error
         if(error){
             return res.status(400).send({
                 status: "error",
@@ -168,6 +182,7 @@ const updateAuthorization = (req, res) => {
             });
         }
 
+        //Devolver resultado de exito
         return res.status(200).send({
             status: "success",
             message: "Se ha actualizado la autorizacion",
@@ -178,8 +193,7 @@ const updateAuthorization = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad de logearse como usuario
+//Listo (usuario)
 const login = (req, res) => {
 
     //Recoger parametros
@@ -233,8 +247,7 @@ const login = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad de ver que cada usuario vea su perfil
+//Listo (usuario)
 const viewprofile = (req, res) => {
 
     //Recibir el parametro del id de usuario por la url
@@ -263,8 +276,7 @@ const viewprofile = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad para el admin para que pueda ver todos los usuarios registrados en el sistema
+//Listo (admin)
 const viewProfiles = (req, res) => {
 
     User.find()
@@ -287,14 +299,16 @@ const viewProfiles = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad de eliminar la cuenta de un usuario
+//Listo (usuario)
 const deleteUser = (req, res) => {
 
+    //Se recoge id de usuario por url
     let id = req.params.id;
 
+    //Se obtienen posibles reservas del usuario a eliminar
     Reserva.find((error, reservas) => {
 
+        //Si el usuario registra reserva no podra ser eliminado
         if(reservas.length >= 1){
 
             return res.status(400).send({
@@ -304,8 +318,10 @@ const deleteUser = (req, res) => {
 
         }
 
+        //Se obtiene usuario por la id ingresada y se elimina
         User.findByIdAndDelete(id, (error, reserva) => {
 
+            //En caso de error
             if(error){
                 return res.status(400).send({
                     status: "error",
@@ -313,6 +329,7 @@ const deleteUser = (req, res) => {
                 });
             }
 
+            //Devolver resultado de exito
             return res.status(200).send({
                 status: "success",
                 message: "El usuario se ha eliminado con exito"
@@ -324,8 +341,7 @@ const deleteUser = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad de subir una imagen para un usuario
+//Listo (usuario)
 const subirImagen = (req, res) => {
 
     //Recoger el fichero de imagen subido
@@ -388,8 +404,7 @@ const subirImagen = (req, res) => {
 
 }
 
-//Listo
-//Funcionalidad para ver una imagen
+//Listo (todos)
 const conseguirImagen = (req, res) => {
 
     let fichero = req.params.fichero;

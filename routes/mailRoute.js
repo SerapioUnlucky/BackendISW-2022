@@ -1,8 +1,8 @@
 const express = require("express");
 const mailController = require("../controllers/mailController");
 const router = express.Router();
-const check = require("../middlewares/authAdmin");
+const checkAdmin = require("../middlewares/authAdmin");
 
-router.post("/mantencion", check.auth, mailController.enviarAvisoMantencion);
+router.post("/mantencion", checkAdmin.auth, mailController.enviarAvisoMantencion);
 
 module.exports = router;

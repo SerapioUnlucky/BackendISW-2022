@@ -20,7 +20,7 @@ const almacenamiento = multer.diskStorage({
 const subidas = multer({storage: almacenamiento});
 
 router.post("/subir_imagen/:id", [subidas.single("file0")], userController.subirImagen);
-router.get("/ver_imagen/:fichero", checkUser.auth, userController.conseguirImagen);
+router.get("/ver_imagen/:fichero", userController.conseguirImagen);
 router.post("/crear_usuario", userController.createUser);
 router.post("/login_usuario", userController.login);
 router.get("/ver_perfil/:id", checkUser.auth, userController.viewprofile);

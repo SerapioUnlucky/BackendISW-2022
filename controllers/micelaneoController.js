@@ -1,23 +1,27 @@
 const reserva = require('../models/reservaModel');
 const usuario = require('../models/userModel')
 
+//Listo
 const generarInforme = (req,res) => {
 
-    const {fecharec,year,month} = req.body;
+    const {fecharec} = req.body;
 
     //validadcion disponibilidad aqui
     const usos = 12; //!POR AHORA
-
     let fecha = new Date();
     fecha.setHours(0,0,0,0)
     fecha.setDate(1);
 
     let fechaReque = new Date(fecharec);
+
     fechaReque.setDate(1);
     fechaReque.setHours(0,0,0,0);
-    let fechaFina = new Date(fechaReque.getTime())
-    fechaFina.setHours(23,59,59,0)
-    fechaFina.setDate(29)
+
+    let fechaFina = new Date(fechaReque.getTime());
+
+    fechaFina.setHours(0,0,0,0);
+    fechaFina.setMonth(fechaReque.getMonth()+1);
+    fechaFina.setDate(0);
 
     if (fechaReque.getTime()>fecha.getTime()){//!AGREGAR IGUAL "="
         return res.status(406).send({message:"la fecha ingresada no es valida"})
@@ -36,18 +40,15 @@ const generarInforme = (req,res) => {
             }
             let auxlav = 0;
             let auxsec = 0;
-            reserva.find({fechaReserva:{"$gte":fechaReque.toJSON(),"$lte":fechaFina.toJSON(),usuario:usr}})
-            reserva.find({year:year,month:month,usuario:usr}, function(err,reser){
+            reserva.find({fechaReserva:{"$gte":fechaReque.toJSON(),"$lte":fechaFina.toJSON()},usuario:usr._id}, function(err,reser){
                 if (err) throw err;
                 reser.forEach(re => {
-                    if(re.tipo == "lavadora"){
+                    if(re.tipo == "Lavadora"){
                         auxlav++;
                     }else{
                         auxsec++;
                     }
                 })
-            //? PREGUNTAR SI ESTA PARTE ESTA BIEN
-            //! POSIBLE REESTRUCTURADO
             if ((auxlav+auxsec) > usos){
                 cuenta.cargo = (auxlav+auxsec-usos)*1000;
                 cuenta.sobreCargo = cuenta.cargo;
@@ -57,7 +58,6 @@ const generarInforme = (req,res) => {
 
             cuenta.usoLav = auxlav;
             cuenta.usoSec = auxsec;
-            //console.log(cuenta)
             if(cuenta.cargo != 0){
                 cuentaArray.push(cuenta);
             }
