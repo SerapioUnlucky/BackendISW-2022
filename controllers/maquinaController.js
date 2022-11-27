@@ -21,7 +21,7 @@ const crearMaquina = (req, res) => {
     maquina.find({serial: params.serial}, (error, seriales) => {
 
         //En caso de que si este la maquina con el serial
-        if(seriales){
+        if(seriales.length == 1){
             return res.status(400).send({
                 status: "error",
                 message: "Ya existe una maquina con el serial ingresado"
@@ -124,7 +124,7 @@ const modificarSerialMaquina = (req, res) => {
     maquina.find({serial: serial}, (error, seriales) => {
 
         //En caso de que si este la maquina con el serial
-        if(seriales){
+        if(seriales.length == 1){
             return res.status(400).send({
                 status: "error",
                 message: "Ya existe una maquina con el serial ingresado"
