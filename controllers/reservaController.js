@@ -361,6 +361,14 @@ const viewReservations = (req, res) => {
             });
         }
 
+        //En caso de que no haya reservar para mostrar
+        if(reservations.length == 0){
+            return res.status(400).send({
+                status: "error",
+                message: "No se han encontrado reservas"
+            });
+        }
+
         //Devolver resultado de exito
         return res.status(200).send({
             status: "success",
@@ -379,7 +387,15 @@ const viewAllReservations = (req, res) => {
     Reserva.find((error, reservations) => {
 
         //En caso de error
-        if(error || !reservations){
+        if(error){
+            return res.status(400).send({
+                status: "error",
+                message: "No se han encontrado reservas"
+            });
+        }
+
+        //En caso de que no haya reservar para mostrar
+        if(reservations.length == 0){
             return res.status(400).send({
                 status: "error",
                 message: "No se han encontrado reservas"

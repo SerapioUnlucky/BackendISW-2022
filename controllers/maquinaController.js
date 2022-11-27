@@ -17,22 +17,35 @@ const crearMaquina = (req, res) => {
     //Creacion del objeto
     let newMaquina = new maquina(params);
 
-    //Procede a guardar la nueva maquina
-    newMaquina.save((error, maquina) => {
+    //Se obtiene la posible maquina que ya tiene el serial ingresado
+    maquina.find({serial: params.serial}, (error, seriales) => {
 
-        //En caso de error
-        if(error){
+        //En caso de que si este la maquina con el serial
+        if(seriales){
             return res.status(400).send({
-                message: "Hubo un error al guardar la maquina"
+                status: "error",
+                message: "Ya existe una maquina con el serial ingresado"
             });
         }
 
-        //Devuelve resultado exitoso de creacion de maquina
-        return res.status(200).send({
-            message: "Se registro correctamente la nueva maquina",
-            maquina: maquina
-        });
+        //Procede a guardar la nueva maquina
+        newMaquina.save((error, maquina) => {
 
+            //En caso de error
+            if(error){
+                return res.status(400).send({
+                    message: "Hubo un error al guardar la maquina"
+                });
+            }
+
+            //Devuelve resultado exitoso de creacion de maquina
+            return res.status(200).send({
+                message: "Se registro correctamente la nueva maquina",
+                maquina: maquina
+            });
+
+        });
+        
     });
 
 }
@@ -100,22 +113,35 @@ const modificarSerialMaquina = (req, res) => {
         });
     }
 
-    //Buscar por la id la maquina que se desea modificar el serial
-    maquina.findByIdAndUpdate(id, serial, (error, maquina) => {
+    //Se obtiene la posible maquina que ya tiene el serial ingresado
+    maquina.find({serial: serial}, (error, seriales) => {
 
-        //En caso de error
-        if(error){
+        //En caso de que si este la maquina con el serial
+        if(seriales){
             return res.status(400).send({
-                message: "Hubo un error al modificar la maquina"
+                status: "error",
+                message: "Ya existe una maquina con el serial ingresado"
             });
         }
 
-        //Devuelve resultado exitoso de modificacion
-        return res.status(200).send({
-            message: "Se modifico correctamente la maquina",
-            maquina: maquina
-        });
+        //Buscar por la id la maquina que se desea modificar el serial
+        maquina.findByIdAndUpdate(id, serial, (error, maquina) => {
 
+            //En caso de error
+            if(error){
+                return res.status(400).send({
+                    message: "Hubo un error al modificar la maquina"
+                });
+            }
+
+            //Devuelve resultado exitoso de modificacion
+            return res.status(200).send({
+                message: "Se modifico correctamente la maquina",
+                maquina: maquina
+            });
+
+        });
+    
     });
 
 }
@@ -130,6 +156,14 @@ const obtenerMaquinas = (req, res) => {
         if(error){
             return res.status(400).send({
                 message: "Hubo un error al conseguir las maquinas"
+            });
+        }
+
+        //En caso de que no hayan maquinas para mostrar
+        if(maquinas.length == 0){
+            return res.status(406).send({
+                status: "error",
+                message: "No se han encontrados maquinas"
             });
         }
 
@@ -156,6 +190,14 @@ const obtenerLavadoras = (req, res) => {
             });
         }
 
+        //En caso de que no hayan lavadoras para mostrar
+        if(lavadoras.length == 0){
+            return res.status(406).send({
+                status: "error",
+                message: "No se han encontrados lavadoras"
+            });
+        }
+
         //Devuelve resultado exitoso de obtencion
         return res.status(200).send({
             message: "Lavadoras encontradas",
@@ -176,6 +218,14 @@ const obtenerSecadoras = (req, res) => {
         if(error){
             return res.status(400).send({
                 message: "Hubo un error al conseguir las secadoras"
+            });
+        }
+
+        //En caso de que no hayan secadoras para mostrar
+        if(secadoras.length == 0){
+            return res.status(406).send({
+                status: "error",
+                message: "No se han encontrados secadoras"
             });
         }
 
