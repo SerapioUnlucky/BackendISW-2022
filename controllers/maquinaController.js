@@ -21,7 +21,7 @@ const crearMaquina = (req, res) => {
     maquina.find({serial: params.serial}, (error, seriales) => {
 
         //En caso de que si este la maquina con el serial
-        if(seriales.length == 1){
+        if(seriales.length === 1){
             return res.status(400).send({
                 status: "error",
                 message: "Ya existe una maquina con el serial ingresado"
@@ -110,10 +110,10 @@ const modificarSerialMaquina = (req, res) => {
 
     //Se reciben los parametros
     let id = req.params.id;
-    let serial = req.body;
+    let params = req.body;
 
     //Validacion de si se obtiene el serial
-    if(!serial){
+    if(!params.serial){
         return res.status(406).send({
             status: "error",
             message: "No se ingreso el serial para modificar"
@@ -121,10 +121,10 @@ const modificarSerialMaquina = (req, res) => {
     }
 
     //Se obtiene la posible maquina que ya tiene el serial ingresado
-    maquina.find({serial: serial}, (error, seriales) => {
+    maquina.find({serial: params.serial}, (error, seriales) => {
 
         //En caso de que si este la maquina con el serial
-        if(seriales.length == 1){
+        if(seriales.length === 1){
             return res.status(400).send({
                 status: "error",
                 message: "Ya existe una maquina con el serial ingresado"
@@ -132,12 +132,20 @@ const modificarSerialMaquina = (req, res) => {
         }
 
         //Buscar por la id la maquina que se desea modificar el serial
-        maquina.findByIdAndUpdate(id, serial, (error, maquina) => {
+        maquina.findByIdAndUpdate(id, params.serial, (error, maquina) => {
 
             //En caso de error
             if(error){
                 return res.status(400).send({
                     message: "Hubo un error al modificar la maquina"
+                });
+            }
+
+            //En caso que la maquina no exista
+            if(!maquina){
+                return res.status(406).send({
+                    status: "error",
+                    message: "No existe la maquina que se quiere modificar la serial"
                 });
             }
 

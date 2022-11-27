@@ -187,7 +187,7 @@ const updateReservation = (req, res) => {
     Reserva.find({ usuario: params.usuario, fechaReserva: params.fechaReserva }, (error, reserva) => {
 
         //Si el usuario registra una reserva donde ya tiene registrada una reserva se activara esta validacion
-        if (reserva.length == 1) {
+        if (reserva.length === 1) {
 
             return res.status(400).send({
                 status: "error",
