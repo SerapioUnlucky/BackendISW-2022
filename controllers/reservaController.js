@@ -320,7 +320,7 @@ const deleteReservation = (req, res) => {
         if(!reserva){
             return res.status(406).send({
                 status: "error",
-                message: "No hay reserva que eliminar"
+                message: "La reserva a eliminar no existe"
             });
         }
 

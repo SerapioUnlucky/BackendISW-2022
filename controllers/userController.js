@@ -185,7 +185,7 @@ const updateAuthorization = (req, res) => {
         if(!user){
             return res.status(406).send({
                 status: "error",
-                message: "No hay usuario que modificar la autorizacion"
+                message: "El usuario a modificar la autorizacion no existe"
             });
         }
 
@@ -339,7 +339,7 @@ const deleteUser = (req, res) => {
             if(!reserva){
                 return res.status(406).send({
                     status: "error",
-                    message: "No hay usuario que eliminar"
+                    message: "El usuario a eliminar no existe"
                 });
             }
 

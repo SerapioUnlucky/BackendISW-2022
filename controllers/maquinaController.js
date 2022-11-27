@@ -61,7 +61,7 @@ const eliminarMaquina = (req, res) => {
         if(!tipoMaquina){
             return res.status(406).send({
                 status: "error",
-                message: "No hay maquina que eliminar"
+                message: "La maquina a eliminar no existe"
             });
         }
 
