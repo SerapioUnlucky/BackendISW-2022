@@ -141,13 +141,6 @@ const modificarSerialMaquina = (req, res) => {
                 });
             }
 
-            if(!maquina){
-                return res.status(406).send({
-                    status: "error",
-                    message: "No hay maquina que modificar"
-                });
-            }
-
             //Devuelve resultado exitoso de modificacion
             return res.status(200).send({
                 message: "Se modifico correctamente la maquina",
