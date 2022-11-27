@@ -81,6 +81,13 @@ const eliminarMaquina = (req, res) => {
                             message: "Hubo un error al eliminar la maquina"
                         });
                     }
+
+                    if(!maquina){
+                        return res.status(406).send({
+                            status: "error",
+                            message: "No hay maquina que eliminar"
+                        });
+                    }
             
                     //Devuelve un resultado exitoso de eliminacion
                     return res.status(200).send({
@@ -131,6 +138,13 @@ const modificarSerialMaquina = (req, res) => {
             if(error){
                 return res.status(400).send({
                     message: "Hubo un error al modificar la maquina"
+                });
+            }
+
+            if(!maquina){
+                return res.status(406).send({
+                    status: "error",
+                    message: "No hay maquina que modificar"
                 });
             }
 

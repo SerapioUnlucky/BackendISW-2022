@@ -225,6 +225,14 @@ const updateReservation = (req, res) => {
                                     message: "Ha ocurrido un error al actualizar la reserva, intentelo nuevamente"
                                 });
                             }
+
+                            //En caso de que no exita la reserva que se quiere modificar
+                            if(!reservation){
+                                return res.status(406).send({
+                                    status: "error",
+                                    message: "No hay reserva que modificar"
+                                });
+                            }
                 
                             //Constantes para un email de modificacion
                             const message = "Estimado cliente se le informa que se ha realizado con exito la modificacion de la reserva en nuestra lavanderia para la nueva fecha ";
@@ -283,6 +291,14 @@ const deleteReservation = (req, res) => {
 
     //Se busca la reserva por la id
     Reserva.findOne({ _id: id }, (error, reserva) => {
+
+        //En caso de no encontrar ninguna reserva a eliminar
+        if(!reserva){
+            return res.status(406).send({
+                status: "error",
+                message: "No hay reserva que eliminar"
+            });
+        }
 
         //Se obtiene el usuario de la reserva
         let usuario = reserva.usuario;

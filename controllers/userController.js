@@ -182,6 +182,13 @@ const updateAuthorization = (req, res) => {
             });
         }
 
+        if(!user){
+            return res.status(406).send({
+                status: "error",
+                message: "No hay usuario que modificar la autorizacion"
+            });
+        }
+
         //Devolver resultado de exito
         return res.status(200).send({
             status: "success",
@@ -326,6 +333,13 @@ const deleteUser = (req, res) => {
                 return res.status(400).send({
                     status: "error",
                     message: "Ha ocurrido un error al eliminar el usuario intentelo nuevamente"
+                });
+            }
+
+            if(!reserva){
+                return res.status(406).send({
+                    status: "error",
+                    message: "No hay usuario que eliminar"
                 });
             }
 
