@@ -110,7 +110,7 @@ const modificarSerialMaquina = (req, res) => {
 
     //Se reciben los parametros
     let id = req.params.id;
-    const serial = req.body;
+    let serial = req.body;
 
     //Validacion de si se obtiene el serial
     if(!serial){
