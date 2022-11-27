@@ -26,14 +26,14 @@ const createReservation = (req, res) => {
     if(hora < 8 || hora > 21){
         return res.status(406).send({
             status: "error",
-            message: "La hora ingresada no es valida"
+            message: "La hora ingresada no es válida"
         });
     }
 
     if(date.getTime() <= dateNow.getTime()){
         return res.status(406).send({
             status: "error",
-            message: "La fecha ingresada no es valida"
+            message: "La fecha ingresada no es válida"
         });
     }
 
@@ -53,7 +53,7 @@ const createReservation = (req, res) => {
 
             return res.status(400).send({
                 status: "error",
-                message: "Estimado usuario ya registra una reserva para la fecha y hora seleccionada"
+                message: "Ya registra una reserva para la fecha y hora seleccionada"
             });
 
         }
@@ -69,7 +69,7 @@ const createReservation = (req, res) => {
 
                         return res.status(400).send({
                             status: "error",
-                            message: "No hay maquinas disponibles para la fecha y hora selecciona"
+                            message: "No hay máquinas disponibles para la fecha y hora selecciona"
                         });
 
                     }
@@ -100,7 +100,7 @@ const createReservation = (req, res) => {
                             }
             
                             //Constantes para el correo 
-                            const message = "Estimado cliente se le informa que se ha realizado con exito la reserva en nuestra lavanderia para la fecha ";
+                            const message = "Estimado cliente se le informa que se ha realizado con éxito la reserva en nuestra lavandería para la fecha ";
                             const token = process.env.PW;
                             const mail = "servicio.lavanderia2022@gmail.com";
 
@@ -119,7 +119,7 @@ const createReservation = (req, res) => {
                             const mailOptions = {
                                 from: "Administración <" + mail + ">",
                                 to: user.email,
-                                subject: "Notificacion de reserva",
+                                subject: "Notificación de reserva",
                                 html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                             }
             
@@ -129,7 +129,7 @@ const createReservation = (req, res) => {
                             //Devolver resultado de exito
                             return res.status(200).send({
                                 status: "success",
-                                message: "La reserva se ha registrado con exito",
+                                message: "La reserva se ha registrado con éxito",
                                 reserva: reserva
                             });
             
@@ -172,14 +172,14 @@ const updateReservation = (req, res) => {
     if(hora < 8 || hora > 21){
         return res.status(406).send({
             status: "error",
-            message: "La hora ingresada no es valida"
+            message: "La hora ingresada no es válida"
         });
     }
 
     if(date.getTime() <= dateNow.getTime()){
         return res.status(406).send({
             status: "error",
-            message: "La fecha ingresada no es valida"
+            message: "La fecha ingresada no es válida"
         });
     }
 
@@ -199,7 +199,7 @@ const updateReservation = (req, res) => {
 
             return res.status(400).send({
                 status: "error",
-                message: "Estimado usuario ya registra una reserva para la fecha y hora seleccionada"
+                message: "Ya registra una reserva para la fecha y hora seleccionada"
             });
 
         }
@@ -215,7 +215,7 @@ const updateReservation = (req, res) => {
     
                         return res.status(400).send({
                             status: "error",
-                            message: "No hay maquinas disponibles para la fecha y hora seleccionada"
+                            message: "No hay máquinas disponibles para la fecha y hora seleccionada"
                         });
     
                     }
@@ -246,7 +246,7 @@ const updateReservation = (req, res) => {
                             if (error) {
                                 return res.status(400).send({
                                     status: "error",
-                                    message: "Ha ocurrido un error al actualizar la reserva, intentelo nuevamente"
+                                    message: "Ha ocurrido un error al actualizar la reserva, inténtelo nuevamente"
                                 });
                             }
 
@@ -259,7 +259,7 @@ const updateReservation = (req, res) => {
                             }
                 
                             //Constantes para un email de modificacion
-                            const message = "Estimado cliente se le informa que se ha realizado con exito la modificacion de la reserva en nuestra lavanderia para la nueva fecha ";
+                            const message = "Estimado cliente se le informa que se ha realizado con éxito la modificación de la reserva en nuestra lavandería para la nueva fecha ";
                             const token = process.env.PW;
                             const mail = "servicio.lavanderia2022@gmail.com";
                             let hora = date.getHours()+3;
@@ -279,7 +279,7 @@ const updateReservation = (req, res) => {
                             const mailOptions = {
                                 from: "Administración <" + mail + ">",
                                 to: user.email,
-                                subject: "Modificacion de reserva",
+                                subject: "Modificación de reserva",
                                 html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                             }
                 
@@ -343,7 +343,7 @@ const deleteReservation = (req, res) => {
         User.findOne({ _id: usuario }, (error, user) => {
 
             //Constantes para un email de cancelacion
-            const message = "Estimado cliente se le informa que se ha cancelado con exito la reserva que tenia agendada en nuestra lavanderia";
+            const message = "Estimado cliente se le informa que se ha cancelado con éxito la reserva que tenía agendada en nuestra lavandería";
             const token = process.env.PW;
             const mail = "servicio.lavanderia2022@gmail.com";
 
@@ -362,7 +362,7 @@ const deleteReservation = (req, res) => {
             const mailOptions = {
                 from: "Administración <" + mail + ">",
                 to: user.email,
-                subject: "Cancelacion de reserva",
+                subject: "Cancelación de reserva",
                 html: "<h3>"+message+"</h3>"
             }
 
@@ -375,7 +375,7 @@ const deleteReservation = (req, res) => {
             //Devolver resultado de exito
             return res.status(200).send({
                 status: "success",
-                message: "Se ha cancelado la reserva con exito"
+                message: "Se ha cancelado la reserva con éxito"
             });
 
         });

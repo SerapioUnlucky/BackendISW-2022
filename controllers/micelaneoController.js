@@ -24,7 +24,7 @@ const generarInforme = (req,res) => {
     fechaFina.setDate(0);
 
     if (fechaReque.getTime()>fecha.getTime()){//!AGREGAR IGUAL "="
-        return res.status(406).send({message:"la fecha ingresada no es valida"})
+        return res.status(406).send({message:"La fecha ingresada no es válida"})
     }
     
     usuario.find({}, function(err,users){
@@ -62,7 +62,7 @@ const generarInforme = (req,res) => {
                 cuentaArray.push(cuenta);
             }
             if(users[users.length-1].id == usr.id)
-                return res.status(200).send({message:"lista generada",lista:cuentaArray})
+                return res.status(200).send({message:"Lista generada",lista:cuentaArray})
             })
         });
     });

@@ -24,7 +24,7 @@ const crearMaquina = (req, res) => {
         if(seriales.length === 1){
             return res.status(400).send({
                 status: "error",
-                message: "Ya existe una maquina con el serial ingresado"
+                message: "Ya existe una máquina con el serial ingresado"
             });
         }
 
@@ -34,13 +34,13 @@ const crearMaquina = (req, res) => {
             //En caso de error
             if(error){
                 return res.status(400).send({
-                    message: "Hubo un error al guardar la maquina"
+                    message: "Hubo un error al guardar la máquina"
                 });
             }
 
             //Devuelve resultado exitoso de creacion de maquina
             return res.status(200).send({
-                message: "Se registro correctamente la nueva maquina",
+                message: "Se registró correctamente la nueva máquina",
                 maquina: maquina
             });
 
@@ -61,7 +61,7 @@ const eliminarMaquina = (req, res) => {
         if(!tipoMaquina){
             return res.status(406).send({
                 status: "error",
-                message: "La maquina a eliminar no existe"
+                message: "La máquina a eliminar no existe"
             });
         }
 
@@ -75,7 +75,7 @@ const eliminarMaquina = (req, res) => {
                 if(reservaMaquinas.length >= maquinas.length){
                     return res.status(400).send({
                         status: "error",
-                        message: "El tipo de maquina que desea eliminar estan todas reservadas por ende no puede ser eliminado"
+                        message: "El tipo de máquina que desea eliminar están todas reservadas por ende no puede ser eliminado"
                     });
                 }
 
@@ -85,13 +85,13 @@ const eliminarMaquina = (req, res) => {
                     //En caso de error
                     if(error){
                         return res.status(400).send({
-                            message: "Hubo un error al eliminar la maquina"
+                            message: "Hubo un error al eliminar la máquina"
                         });
                     }
             
                     //Devuelve un resultado exitoso de eliminacion
                     return res.status(200).send({
-                        message: "Se elimino la maquina correctamente",
+                        message: "Se eliminó la máquina correctamente",
                         maquina: maquina
                     });
             
@@ -116,7 +116,7 @@ const modificarSerialMaquina = (req, res) => {
     if(!params.serial){
         return res.status(406).send({
             status: "error",
-            message: "No se ingreso el serial para modificar"
+            message: "No se ingresó el serial para modificar"
         });
     }
 
@@ -127,7 +127,7 @@ const modificarSerialMaquina = (req, res) => {
         if(seriales.length === 1){
             return res.status(400).send({
                 status: "error",
-                message: "Ya existe una maquina con el serial ingresado"
+                message: "Ya existe una máquina con el serial ingresado"
             });
         }
 
@@ -137,7 +137,7 @@ const modificarSerialMaquina = (req, res) => {
             //En caso de error
             if(error){
                 return res.status(400).send({
-                    message: "Hubo un error al modificar la maquina"
+                    message: "Hubo un error al modificar la máquina"
                 });
             }
 
@@ -145,13 +145,13 @@ const modificarSerialMaquina = (req, res) => {
             if(!maquina){
                 return res.status(406).send({
                     status: "error",
-                    message: "No existe la maquina que se quiere modificar la serial"
+                    message: "No existe la máquina que se quiere modificar la serial"
                 });
             }
 
             //Devuelve resultado exitoso de modificacion
             return res.status(200).send({
-                message: "Se modifico correctamente la maquina",
+                message: "Se modificó correctamente la máquina",
                 maquina: maquina
             });
 
@@ -170,7 +170,7 @@ const obtenerMaquinas = (req, res) => {
         //En caso de error
         if(error){
             return res.status(400).send({
-                message: "Hubo un error al conseguir las maquinas"
+                message: "Hubo un error al conseguir las máquinas"
             });
         }
 
@@ -178,13 +178,13 @@ const obtenerMaquinas = (req, res) => {
         if(maquinas.length == 0){
             return res.status(406).send({
                 status: "error",
-                message: "No se han encontrados maquinas"
+                message: "No se han encontrado máquinas"
             });
         }
 
         //Devuelve resultado exitoso de obtencion
         return res.status(200).send({
-            message: "Maquinas encontradas",
+            message: "Máquinas encontradas",
             maquinas: maquinas
         });
 
@@ -266,13 +266,13 @@ const obtenerMaquina = (req, res) => {
         //En caso de error
         if(error){
             return res.status(400).send({
-                message: "Hubo un error al conseguir la maquina"
+                message: "Hubo un error al conseguir la máquina"
             });
         }
 
         //Devuelve resultado exitoso de obtencion
         return res.status(200).send({
-            message: "Maquina encontrada",
+            message: "Máquina encontrada",
             maquina: maquina
         });
 

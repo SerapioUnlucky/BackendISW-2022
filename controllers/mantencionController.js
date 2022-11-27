@@ -10,17 +10,39 @@ const crearMantencion = async (req, res) => {
     const { fechaIni, fechaFin, maquinaid } = req.body;
 
     if(!fechaIni||!fechaFin||!maquinaid){
-        return res.status(400).send({message:"faltan datos"})
+        return res.status(400).send({message:"Faltan datos"})
+    }
+
+    const validacionFecha = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+
+    if(!validacionFecha.test(fechaIni)){
+        return res.status(406).send({
+            message: "El formato de la fecha inicial ingresada no es válida"
+        });
+    }
+
+    if(!validacionFecha.test(fechaFin)){
+        return res.status(406).send({
+            message: "El formato de la fecha final ingresada no es válida"
+        });
     }
 
     let fechaInicio = new Date(fechaIni);
     let fechaFinal = new Date(fechaFin);
-    fechaInicio.setHours(0, 0, 0, 0)
-    fechaFinal.setHours(0, 0, 0, 0)
+    let dateNow  = new Date();
+    dateNow.setHours(0, 0, 0, 0)
+    fechaInicio.setHours(24+5, 0, 0, 0)
+    fechaFinal.setHours(24+20, 0, 0, 0)
+
+    if(fechaInicio.getTime() < dateNow.getTime()){
+        return res.status(400).send({
+            message: "La fecha de inicio no puede ser menor a la actual"
+        });
+    }
 
     if (fechaInicio.getTime() > fechaFinal.getTime()) {
         return res.status(400).send({
-            message: "la fecha final no puede ser menor a la fecha de inicio"
+            message: "La fecha final no puede ser menor a la fecha de inicio"
         })
     }
 
@@ -72,7 +94,7 @@ const crearMantencion = async (req, res) => {
 
                                 User.findById(user.usuario, (error, use) => {
 
-                                    const message = "Estimado cliente se le informa que se ha eliminado su reserva debido a una mantencion programa para ese mismo y hora, por favor le pedimos que vuelva a realizar una reserva en otro horario.";
+                                    const message = "Estimado cliente se le informa que se ha eliminado su reserva debido a una mantención programada para la misma fecha y hora de su reserva, por favor le pedimos que vuelva a realizar una reserva en otro horario";
                                     const token = process.env.PW;
                                     const mail = "servicio.lavanderia2022@gmail.com";
 
@@ -89,7 +111,7 @@ const crearMantencion = async (req, res) => {
                                     const mailOptions = {
                                         from: "Administración <" + mail + ">",
                                         to: use.email,
-                                        subject: "Notificacion de eliminacion de reserva",
+                                        subject: "Notificación de eliminación de reserva",
                                         html: "<h3>" + message + "</h3>"
                                     }
 
@@ -130,75 +152,98 @@ const eliminarMantencion = (req, res) => {
 
     mantencion.findByIdAndRemove(id, function (err, data) {
         if (!err) {
-            return res.status(201).send({ message: "mantencion eliminada" });
+            return res.status(201).send({ message: "Mantención eliminada" });
         } else {
-            return res.status(400).send({ message: "No se pudo eliminar la mantension" })
+            return res.status(400).send({ message: "No se pudo eliminar la mantención" })
         }
     })
 
 }
 
-//Pendiente
+//Listo
 const modificarMantencion = async (req, res) => {
-    
-    const { id, fechaIni, fechaFin, maquinaid } = req.body;
+
+    const {id, fechaIni, fechaFin, maquinaid} = req.body;
+
+    if(!fechaIni||!fechaFin||!maquinaid||!id){
+        return res.status(400).send({message:"Faltan datos"})
+    }
+
+    const validacionFecha = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+
+    if(!validacionFecha.test(fechaIni)){
+        return res.status(406).send({
+            message: "El formato de la fecha inicial ingresada no es válida"
+        });
+    }
+
+    if(!validacionFecha.test(fechaFin)){
+        return res.status(406).send({
+            message: "El formato de la fecha final ingresada no es válida"
+        });
+    }
 
     let fechaInicio = new Date(fechaIni);
     let fechaFinal = new Date(fechaFin);
-    fechaInicio.setHours(0, 0, 0, 0)
-    fechaFinal.setHours(0, 0, 0, 0)
+    let dateNow = new Date();
+    dateNow.setHours(0, 0, 0, 0)
+    fechaInicio.setHours(24+5, 0, 0, 0)
+    fechaFinal.setHours(24+20, 0, 0, 0)
 
-    // if (fechaInicio.getTime() < fechaFinal.getTime()) {
-    //     return res.status(400).send({
-    //         message: "la fecha de inicio no puede ser menor a la fecha final"
-    //     })
-    // }
+    if(fechaInicio < dateNow){
+        return res.status(400).send({
+            message: "La fecha de inicio no puede ser menor a la actual"
+        });
+    }
 
-    await mantencion.findByIdAndUpdate(id, { fechaIni: fechaInicio, fechaFin: fechaFinal, maquinaid: maquinaid }, function (err, data) {
-        if (err) {
-            return res.status(400).send({ message: "No se pudo modificar la mantencion" })
-        }
-    })
+    if(fechaInicio.getTime()>fechaFinal.getTime()){
+        return res.status(400).send({
+            message:"La fecha final no puede ser menor a la fecha de inicio"
+        })
+    }
+
     let tipoMan = await queTipo(maquinaid);
+    await mantencion.findByIdAndUpdate(id,{fechaIni:fechaInicio.toJSON(),fechaFin:fechaFinal.toJSON()}, function(err,data){
+        if(err) throw err;
+        if(err){
+            return res.status(400).send({message:"No se pudo modificar la mantención"})
+        }
+    }).clone().catch(function(err){ console.log(err)});
 
-
-    //! INICIO ELIM 
-
-    let rangres = await rangoReserv(fechaInicio, fechaFinal, tipoMan)
+    let rangres = await rangoReserv(fechaInicio,fechaFinal,tipoMan)
     let coincidencias = new Map()
 
-    for (let re in rangres) {
+    for(let re in rangres){
         let fech = new Date(rangres[re].fechaReserva)
         let fechtime = fech.getTime();
-        coincidencias.set(fechtime, coincidencias.get(fech.getTime()) + 1 || 1);
+        coincidencias.set(fechtime,coincidencias.get(fech.getTime())+1 ||1);
     }
 
     let macs = await macsPorTipo(tipoMan)
-    coincidencias.forEach((value, key) => {
+    coincidencias.forEach((value,key) => {
         let fechaLoca = new Date(key)
 
-        mantencion.countDocuments({ fechaIni: { "$lte": fechaLoca.toJSON() }, fechaFin: { "$gte": fechaLoca.toJSON() }, tipo: tipoMan }, function (err, data) {
-            if (err) throw err
+        mantencion.countDocuments({fechaIni:{"$lte":fechaLoca.toJSON()},fechaFin:{"$gte":fechaLoca.toJSON()},tipo:tipoMan},function(err,data){
+            if(err) throw err
             let numMantenciones = data;
-            if (macs - numMantenciones < value) {
-                //HAY RESERVAS SOBRANTES
-                reserva.find({ tipo: tipoMan, fechaReserva: fechaLoca.toJSON() }, function (err, dat) {
+            if(macs-numMantenciones<value){
+                reserva.find({tipo:tipoMan,fechaReserva:fechaLoca.toJSON()}, function(err,dat){
                     let act = 1;
                     let idLast = 0;
-                    for (let a in dat) {
-                        if (dat[a].createdAt.getTime() > dat[act].createdAt.getTime()) {
-                            act = a
+                    for(let a in dat){
+                        if (dat[a].createdAt.getTime()>dat[act].createdAt.getTime()){
+                            act=a
                             idLast = dat[a]._id;
                         }
                     }
-                    
-                    if (idLast != 0) {
 
+                    if(idLast!=0){
+                        
                         reserva.findById(idLast, (error, user) => {
 
                             User.findById(user.usuario, (error, use) => {
 
-                                const message = "Estimado cliente se le informa que se ha eliminado su reserva debido a una mantencion programa para ese mismo y hora, por favor le pedimos que vuelva a realizar una reserva en otro horario.";
+                                const message = "Estimado cliente se le informa que se ha eliminado su reserva debido a una mantención programada para la misma fecha y hora de su reserva, por favor le pedimos que vuelva a realizar una reserva en otro horario";
                                 const token = process.env.PW;
                                 const mail = "servicio.lavanderia2022@gmail.com";
 
@@ -215,7 +260,7 @@ const modificarMantencion = async (req, res) => {
                                 const mailOptions = {
                                     from: "Administración <" + mail + ">",
                                     to: use.email,
-                                    subject: "Notificacion de eliminacion de reserva",
+                                    subject: "Notificación de eliminación de reserva",
                                     html: "<h3>" + message + "</h3>"
                                 }
 
@@ -225,8 +270,8 @@ const modificarMantencion = async (req, res) => {
 
                         });
 
-                        reserva.findByIdAndDelete(idLast, function (err) {
-                            if (err) throw err
+                        reserva.findByIdAndDelete(idLast,function(err){
+                            if(err) throw err
                         });
 
                     }
@@ -238,13 +283,12 @@ const modificarMantencion = async (req, res) => {
         });
 
     });
-    //! FIN ELIMINACION
 
     return res.status(201).send({
-        message: "mantencion modificada"
-    });
+        message:"mantencione modificada"}
+    );
 
-}
+}    
 
 //Listo
 const obtenerMantenciones = (req, res) => {
@@ -253,11 +297,11 @@ const obtenerMantenciones = (req, res) => {
         if (!err) {
             return res.status(201).send({
                 mantenciones: data,
-                message: "mantenciones obtenidas"
+                message: "Mantenciones obtenidas"
             }
             );
         } else {
-            return res.status(400).send({ message: "No se pudo obtener las mantenciones" })
+            return res.status(400).send({ message: "No se pudieron obtener las mantenciones" })
         }
     })
 }
@@ -271,11 +315,11 @@ const obtenerMantencion = (req, res) => {
         if (!err) {
             return res.status(201).send({
                 mantenciones: data,
-                message: "mantencion obtenida"
+                message: "Mantención obtenida"
             }
             );
         } else {
-            return res.status(400).send({ message: "No se pudo obtener la mantencion" })
+            return res.status(400).send({ message: "No se pudo obtener la mantención" })
         }
     })
 }
