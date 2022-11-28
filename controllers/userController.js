@@ -182,7 +182,7 @@ const updateAuthorization = (req, res) => {
     if(params.autorizado != "Si" && params.autorizado != "No"){
         return res.status(406).send({
             status: "error",
-            message: "No se a ingresado correctamente la nueva autorización"
+            message: "No se ha ingresado correctamente la nueva autorización"
         });
     }
 
