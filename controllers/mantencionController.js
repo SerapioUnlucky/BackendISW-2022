@@ -13,36 +13,12 @@ const crearMantencion = async (req, res) => {
         return res.status(400).send({message:"Faltan datos"})
     }
 
-    await maquina.exists({_id: maquinaid}, (error, maquinaExistente) => {
-
-        if(!maquinaExistente){
-            return res.status(400).send({
-                message: "La máquina ingresada no existe"
-            });
-        }
-
-    });
-
-    const validacionFecha = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
-
-    if(!validacionFecha.test(fechaIni)){
-        return res.status(406).send({
-            message: "El formato de la fecha inicial ingresada no es válida"
-        });
-    }
-
-    if(!validacionFecha.test(fechaFin)){
-        return res.status(406).send({
-            message: "El formato de la fecha final ingresada no es válida"
-        });
-    }
-
     let fechaInicio = new Date(fechaIni);
     let fechaFinal = new Date(fechaFin);
     let dateNow  = new Date();
     dateNow.setHours(0, 0, 0, 0)
-    fechaInicio.setHours(24+5, 0, 0, 0)
-    fechaFinal.setHours(24+20, 0, 0, 0)
+    fechaInicio.setHours(0, 0, 0, 0)
+    fechaFinal.setHours(0, 0, 0, 0)
 
     if(fechaInicio.getTime() < dateNow.getTime()){
         return res.status(400).send({
@@ -68,7 +44,7 @@ const crearMantencion = async (req, res) => {
     try {
         await newMantencion.save();
 
-        //! INICIO ELIM 
+        //! INICIO ELIM
 
         let rangres = await rangoReserv(fechaInicio, fechaFinal, tipoMan)
         let coincidencias = new Map()
@@ -173,23 +149,15 @@ const eliminarMantencion = (req, res) => {
 //Listo
 const modificarMantencion = async (req, res) => {
 
-    const {id, fechaIni, fechaFin, maquinaid} = req.body;
+    const { id, fechaIni, fechaFin, maquinaid } = req.body;
 
-    if(!fechaIni||!fechaFin||!maquinaid||!id){
-        return res.status(400).send({message:"Faltan datos"})
+    if (!fechaIni || !fechaFin || !maquinaid || !id) {
+        return res.status(400).send({ message: "Faltan datos" })
     }
 
-    const validacionFecha = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
-
-    if(!validacionFecha.test(fechaIni)){
+    if (maquinaid.length != 24) {
         return res.status(406).send({
-            message: "El formato de la fecha inicial ingresada no es válida"
-        });
-    }
-
-    if(!validacionFecha.test(fechaFin)){
-        return res.status(406).send({
-            message: "El formato de la fecha final ingresada no es válida"
+            message: "La id ingresada no existe"
         });
     }
 
@@ -197,58 +165,72 @@ const modificarMantencion = async (req, res) => {
     let fechaFinal = new Date(fechaFin);
     let dateNow = new Date();
     dateNow.setHours(0, 0, 0, 0)
-    fechaInicio.setHours(24+5, 0, 0, 0)
-    fechaFinal.setHours(24+20, 0, 0, 0)
+    fechaInicio.setHours(0, 0, 0, 0)
+    fechaFinal.setHours(0, 0, 0, 0)
 
-    if(fechaInicio < dateNow){
+    if (fechaInicio < dateNow) {
         return res.status(400).send({
             message: "La fecha de inicio no puede ser menor a la actual"
         });
     }
 
-    if(fechaInicio.getTime()>fechaFinal.getTime()){
+    if (fechaInicio.getTime() > fechaFinal.getTime()) {
         return res.status(400).send({
-            message:"La fecha final no puede ser menor a la fecha de inicio"
+            message: "La fecha final no puede ser menor a la fecha de inicio"
         })
     }
+    let tipoMan
+    await maquina.exists({ _id: maquinaid }, function (err, encon) {
+        if (err) throw err;
+        console.log(encon, "SI ES QUE SE ENCONTRO")
 
-    let tipoMan = await queTipo(maquinaid);
-    await mantencion.findByIdAndUpdate(id,{fechaIni:fechaInicio.toJSON(),fechaFin:fechaFinal.toJSON()}, function(err,data){
-        if(err) throw err;
-        if(err){
-            return res.status(400).send({message:"No se pudo modificar la mantención"})
+        if (!encon) {
+            tipoMan = encon;
+            return res.status(400).send({ message: "NO EXISTE ESTA MAQUINA", enc: encon });
+        } else {
+            maquina.findById(maquinaid, function (err, sos) {
+                tipoMan = sos.tipo;
+            })
         }
-    }).clone().catch(function(err){ console.log(err)});
+    });
 
-    let rangres = await rangoReserv(fechaInicio,fechaFinal,tipoMan)
+    //let tipoManz = await queTipo(maquinaid);
+    await mantencion.findByIdAndUpdate(id, { fechaIni: fechaInicio.toJSON(), fechaFin: fechaFinal.toJSON() }, function (err, data) {
+        if (err) throw err;
+        if (err) {
+            return res.status(400).send({ message: "No se pudo modificar la mantención" })
+        }
+    }).clone().catch(function (err) { console.log(err) });
+
+    let rangres = await rangoReserv(fechaInicio, fechaFinal, tipoMan)
     let coincidencias = new Map()
 
-    for(let re in rangres){
+    for (let re in rangres) {
         let fech = new Date(rangres[re].fechaReserva)
         let fechtime = fech.getTime();
-        coincidencias.set(fechtime,coincidencias.get(fech.getTime())+1 ||1);
+        coincidencias.set(fechtime, coincidencias.get(fech.getTime()) + 1 || 1);
     }
 
     let macs = await macsPorTipo(tipoMan)
-    coincidencias.forEach((value,key) => {
+    coincidencias.forEach((value, key) => {
         let fechaLoca = new Date(key)
 
-        mantencion.countDocuments({fechaIni:{"$lte":fechaLoca.toJSON()},fechaFin:{"$gte":fechaLoca.toJSON()},tipo:tipoMan},function(err,data){
-            if(err) throw err
+        mantencion.countDocuments({ fechaIni: { "$lte": fechaLoca.toJSON() }, fechaFin: { "$gte": fechaLoca.toJSON() }, tipo: tipoMan }, function (err, data) {
+            if (err) throw err
             let numMantenciones = data;
-            if(macs-numMantenciones<value){
-                reserva.find({tipo:tipoMan,fechaReserva:fechaLoca.toJSON()}, function(err,dat){
+            if (macs - numMantenciones < value) {
+                reserva.find({ tipo: tipoMan, fechaReserva: fechaLoca.toJSON() }, function (err, dat) {
                     let act = 1;
                     let idLast = 0;
-                    for(let a in dat){
-                        if (dat[a].createdAt.getTime()>dat[act].createdAt.getTime()){
-                            act=a
+                    for (let a in dat) {
+                        if (dat[a].createdAt.getTime() > dat[act].createdAt.getTime()) {
+                            act = a
                             idLast = dat[a]._id;
                         }
                     }
 
-                    if(idLast!=0){
-                        
+                    if (idLast != 0) {
+
                         reserva.findById(idLast, (error, user) => {
 
                             User.findById(user.usuario, (error, use) => {
@@ -280,8 +262,8 @@ const modificarMantencion = async (req, res) => {
 
                         });
 
-                        reserva.findByIdAndDelete(idLast,function(err){
-                            if(err) throw err
+                        reserva.findByIdAndDelete(idLast, function (err) {
+                            if (err) throw err
                         });
 
                     }
@@ -293,12 +275,14 @@ const modificarMantencion = async (req, res) => {
         });
 
     });
+    if (tipoMan) {
+        return res.status(201).send({
+            message: "mantencion modificada"
+        }
+        );
+    }
 
-    return res.status(201).send({
-        message:"mantencione modificada"}
-    );
-
-}    
+}
 
 //Listo
 const obtenerMantenciones = (req, res) => {
@@ -333,7 +317,7 @@ const obtenerMantencion = (req, res) => {
         }
     })
 }
- 
+
 module.exports = {
     crearMantencion,
     eliminarMantencion,
