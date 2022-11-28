@@ -18,10 +18,10 @@ const crearMaquina = (req, res) => {
     let newMaquina = new maquina(params);
 
     //Se obtiene la posible maquina que ya tiene el serial ingresado
-    maquina.find({serial: params.serial}, (error, seriales) => {
+    maquina.exists({serial: params.serial}, (error, seriales) => {
 
         //En caso de que si este la maquina con el serial
-        if(seriales.length === 1){
+        if(seriales){
             return res.status(400).send({
                 status: "error",
                 message: "Ya existe una máquina con el serial ingresado"
@@ -121,10 +121,10 @@ const modificarSerialMaquina = (req, res) => {
     }
 
     //Se obtiene la posible maquina que ya tiene el serial ingresado
-    maquina.find({serial: params.serial}, (error, seriales) => {
+    maquina.exists({serial: params.serial}, (error, seriales) => {
 
         //En caso de que si este la maquina con el serial
-        if(seriales.length === 1){
+        if(seriales){
             return res.status(400).send({
                 status: "error",
                 message: "Ya existe una máquina con el serial ingresado"
@@ -132,7 +132,7 @@ const modificarSerialMaquina = (req, res) => {
         }
 
         //Buscar por la id la maquina que se desea modificar el serial
-        maquina.findByIdAndUpdate(id, params.serial, (error, maquina) => {
+        maquina.findByIdAndUpdate(id, params, (error, maquina) => {
 
             //En caso de error
             if(error){

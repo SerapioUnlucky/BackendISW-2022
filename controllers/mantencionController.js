@@ -13,6 +13,16 @@ const crearMantencion = async (req, res) => {
         return res.status(400).send({message:"Faltan datos"})
     }
 
+    await maquina.exists({_id: maquinaid}, (error, maquinaExistente) => {
+
+        if(!maquinaExistente){
+            return res.status(400).send({
+                message: "La máquina ingresada no existe"
+            });
+        }
+
+    });
+
     const validacionFecha = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
 
     if(!validacionFecha.test(fechaIni)){

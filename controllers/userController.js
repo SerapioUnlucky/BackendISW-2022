@@ -170,9 +170,17 @@ const updateAuthorization = (req, res) => {
 
     //Se recoge id del usuario por url 
     let id = req.params.id;
+    let params = req.body;
+
+    if(!params.autorizado){
+        return res.status(406).send({
+            status: "error",
+            message: "No se ha ingresado la nueva autorización"
+        });
+    }
 
     //Se obtiene el usuario mediante la id ingresada y se modifica su autorizacion
-    User.findByIdAndUpdate(id, req.body, (error, user) => {
+    User.findByIdAndUpdate(id, params, (error, user) => {
 
         //En caso de error
         if(error){
