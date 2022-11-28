@@ -179,6 +179,13 @@ const updateAuthorization = (req, res) => {
         });
     }
 
+    if(params.autorizado != "Si" && params.autorizado != "No"){
+        return res.status(406).send({
+            status: "error",
+            message: "No se a ingresado correctamente la nueva autorización"
+        });
+    }
+
     //Se obtiene el usuario mediante la id ingresada y se modifica su autorizacion
     User.findByIdAndUpdate(id, params, (error, user) => {
 
