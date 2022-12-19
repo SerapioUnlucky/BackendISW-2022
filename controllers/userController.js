@@ -321,14 +321,14 @@ const viewProfiles = (req, res) => {
 
 }
 
-//Listo (usuario)
+//Listo (administrador)
 const deleteUser = (req, res) => {
 
     //Se recoge id de usuario por url
     let id = req.params.id;
 
     //Se obtienen posibles reservas del usuario a eliminar
-    Reserva.find((error, reservas) => {
+    Reserva.find({ usuario:id }, (error, reservas) => {
 
         //Si el usuario registra reserva no podra ser eliminado
         if(reservas.length >= 1){

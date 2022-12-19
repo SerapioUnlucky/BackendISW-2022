@@ -16,9 +16,9 @@ const crearMantencion = async (req, res) => {
     let fechaInicio = new Date(fechaIni);
     let fechaFinal = new Date(fechaFin);
     let dateNow  = new Date();
-    dateNow.setHours(0, 0, 0, 0)
-    fechaInicio.setHours(0, 0, 0, 0)
-    fechaFinal.setHours(0, 0, 0, 0)
+    dateNow.setHours(0, 0, 0, 0);
+    fechaInicio.setDate(fechaInicio.getDate() + 1);
+    fechaFinal.setDate(fechaFinal.getDate() + 1);
 
     if(fechaInicio.getTime() < dateNow.getTime()){
         return res.status(400).send({
@@ -164,9 +164,9 @@ const modificarMantencion = async (req, res) => {
     let fechaInicio = new Date(fechaIni);
     let fechaFinal = new Date(fechaFin);
     let dateNow = new Date();
-    dateNow.setHours(0, 0, 0, 0)
-    fechaInicio.setHours(0, 0, 0, 0)
-    fechaFinal.setHours(0, 0, 0, 0)
+    dateNow.setHours(0, 0, 0, 0);
+    fechaInicio.setDate(fechaInicio.getDate() + 1);
+    fechaFinal.setDate(fechaFinal.getDate() + 1);
 
     if (fechaInicio < dateNow) {
         return res.status(400).send({
@@ -287,7 +287,7 @@ const modificarMantencion = async (req, res) => {
 //Listo
 const obtenerMantenciones = (req, res) => {
 
-    mantencion.find({}, function (err, data) {
+    mantencion.find().populate('maquinaid').exec(function (err, data) {
         if (!err) {
             return res.status(201).send({
                 mantenciones: data,

@@ -9,5 +9,6 @@ api.put("/modificar_reserva/:id", checkUser.auth, reservaController.updateReserv
 api.delete("/eliminar_reserva/:id", checkUser.auth, reservaController.deleteReservation);
 api.get("/ver_mis_reservas/:id", checkUser.auth, reservaController.viewReservations);
 api.get("/ver_reservas", checkAdmin.auth, reservaController.viewAllReservations);
+api.delete("/eliminar_reservas/:id", checkAdmin.auth, reservaController.deleteReservations);
 
 module.exports = api;

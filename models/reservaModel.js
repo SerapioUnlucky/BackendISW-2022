@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const reservaSchema = new Schema({
     usuario: {
         type: Schema.ObjectId,
-        ref: "userModel",
+        ref: "User",
         required: true
     },
     fechaReserva: {

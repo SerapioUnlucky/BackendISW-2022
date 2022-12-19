@@ -26,6 +26,6 @@ router.post("/login_usuario", userController.login);
 router.get("/ver_perfil/:id", checkUser.auth, userController.viewprofile);
 router.get("/ver_perfiles", checkAdmin.auth, userController.viewProfiles);
 router.put("/modificar_autorizacion/:id", checkAdmin.auth, userController.updateAuthorization);
-router.delete("/eliminar_usuario/:id", checkUser.auth, userController.deleteUser);
+router.delete("/eliminar_usuario/:id", checkAdmin.auth, userController.deleteUser);
 
 module.exports = router;

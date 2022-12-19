@@ -20,17 +20,18 @@ const createReservation = (req, res) => {
 
     //Validacion de fechas validas
     let date = new Date(params.fechaReserva);
-    let hora = date.getHours()+3;
+    let hora = date.getHours();
+    date.setHours(hora - 3, 0, 0, 0);
     let dateNow = new Date();
 
-    if(hora < 8 || hora > 21){
+    if (hora < 8 || hora > 21) {
         return res.status(406).send({
             status: "error",
             message: "La hora ingresada no es válida"
         });
     }
 
-    if(date.getTime() <= dateNow.getTime()){
+    if (date.getTime() <= dateNow.getTime()) {
         return res.status(406).send({
             status: "error",
             message: "La fecha ingresada no es válida"
@@ -38,10 +39,10 @@ const createReservation = (req, res) => {
     }
 
     //Buscar en el modelo de usuario si existe el usuario ingresado
-    User.exists({_id: params.usuario}, (error, usuarioExistente) => {
+    User.exists({ _id: params.usuario }, (error, usuarioExistente) => {
 
         //En caso de que el usuario no exista
-        if(!usuarioExistente){
+        if (!usuarioExistente) {
             return res.status(406).send({
                 status: "error",
                 message: "El usuario ingresado no existe"
@@ -62,13 +63,13 @@ const createReservation = (req, res) => {
             }
 
             //Validacion de disponibilidad de maquinas en la hora ingresada
-            mantencion.countDocuments({fechaIni:{"$lte":params.fechaReserva},fechaFin:{"$gte":params.fechaReserva}}, (err, cantMantenciones) => {
+            mantencion.countDocuments({ fechaIni: { "$lte": params.fechaReserva }, fechaFin: { "$gte": params.fechaReserva } }, (err, cantMantenciones) => {
 
-                maquina.countDocuments({tipo:params.tipo}, (error, cantMaquinas) => {
+                maquina.countDocuments({ tipo: params.tipo }, (error, cantMaquinas) => {
 
-                    Reserva.countDocuments({fechaReserva:params.fechaReserva, tipo:params.tipo}, (error, cantReservas) => {
+                    Reserva.countDocuments({ fechaReserva: params.fechaReserva, tipo: params.tipo }, (error, cantReservas) => {
 
-                        if(cantMaquinas - cantMantenciones <= cantReservas){
+                        if (cantMaquinas - cantMantenciones <= cantReservas) {
 
                             return res.status(400).send({
                                 status: "error",
@@ -87,13 +88,13 @@ const createReservation = (req, res) => {
                                     message: "No tiene permisos para realizar reservas"
                                 });
                             }
-                
+
                             //Crear objeto para guardar en la bd
                             let reserva_to_save = new Reserva(params);
-                
+
                             //Guardar en la bd
                             reserva_to_save.save((error, reserva) => {
-                
+
                                 //En caso de error al guardar
                                 if (error) {
                                     return res.status(400).send({
@@ -101,7 +102,7 @@ const createReservation = (req, res) => {
                                         message: "Ha ocurrido un error al registrar la reserva"
                                     });
                                 }
-                
+
                                 //Constantes para el correo 
                                 const message = "Estimado cliente se le informa que se ha realizado con éxito la reserva en nuestra lavandería para la fecha ";
                                 const token = process.env.PW;
@@ -117,7 +118,7 @@ const createReservation = (req, res) => {
                                         pass: token
                                     }
                                 });
-                
+
                                 //Cabeza y cuerpo del email
                                 const mailOptions = {
                                     from: "Administración <" + mail + ">",
@@ -125,19 +126,19 @@ const createReservation = (req, res) => {
                                     subject: "Notificación de reserva",
                                     html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                                 }
-                
+
                                 //Enviar email
                                 transporter.sendMail(mailOptions);
-                
+
                                 //Devolver resultado de exito
                                 return res.status(200).send({
                                     status: "success",
                                     message: "La reserva se ha registrado con éxito",
                                     reserva: reserva
                                 });
-                
+
                             });
-                
+
                         });
 
                     });
@@ -169,151 +170,163 @@ const updateReservation = (req, res) => {
 
     }
 
-    //Validacion de fechas validas
-    let date = new Date(params.fechaReserva);
-    let hora = date.getHours()+3;
-    let dateNow = new Date();
-
-    if(hora < 8 || hora > 21){
-        return res.status(406).send({
-            status: "error",
-            message: "La hora ingresada no es válida"
-        });
-    }
-
-    if(date.getTime() <= dateNow.getTime()){
-        return res.status(406).send({
-            status: "error",
-            message: "La fecha ingresada no es válida"
-        });
-    }
-
     //Buscar en el modelo de usuario si existe el usuario ingresado
-    User.exists({_id: params.usuario}, (error, usuarioExistente) => {
+    User.exists({ _id: params.usuario }, (error, usuarioExistente) => {
 
         //En caso de que el usuario no exista
-        if(!usuarioExistente){
+        if (!usuarioExistente) {
             return res.status(406).send({
                 status: "error",
                 message: "El usuario ingresado no existe"
             });
         }
 
-        //Buscar en el modelo de reserva por la id de usuario y fecha ingresada 
-        Reserva.find({ usuario: params.usuario, fechaReserva: params.fechaReserva }, (error, reserva) => {
+        Reserva.findById(id, (error, fecha) => {
 
-            //Si el usuario registra una reserva donde ya tiene registrada una reserva se activara esta validacion
-            if (reserva.length === 1) {
+            //Validacion de fechas validas
+            let date = new Date(fecha.fechaReserva);
+            let dateNow = new Date();
+            let hora = date.getHours();
+            date.setHours(hora - 3, 0, 0, 0);
 
-                return res.status(400).send({
+            if (date < dateNow) {
+                return res.status(406).send({
                     status: "error",
-                    message: "Ya registra una reserva para la fecha y hora seleccionada"
+                    message: "Esta reserva no se puede modificar ya que la fecha de la reserva es anterior a la fecha actual"
                 });
-
             }
 
-            //Validacion de disponibilidad de maquinas en la hora ingresada
-            mantencion.countDocuments({fechaIni:{"$lte":params.fechaReserva},fechaFin:{"$gte":params.fechaReserva}}, (err, cantMantenciones) => {
+            if (hora < 8 || hora > 21) {
+                return res.status(406).send({
+                    status: "error",
+                    message: "La hora ingresada no es válida"
+                });
+            }
 
-                maquina.countDocuments({tipo:params.tipo}, (error, cantMaquinas) => {
-        
-                    Reserva.countDocuments({fechaReserva:params.fechaReserva, tipo:params.tipo}, (error, cantReservas) => {
-        
-                        if(cantMaquinas - cantMantenciones <= cantReservas){
-        
-                            return res.status(400).send({
-                                status: "error",
-                                message: "No hay máquinas disponibles para la fecha y hora seleccionada"
-                            });
-        
-                        }
-        
-                        //Buscar usuario por parametro de usuario
-                        User.findOne({ _id: params.usuario }, (error, user) => {
-        
-                            //Validacion de si esta autorizado
-                            if (user.autorizado == "No") {
+            if (date.getTime() <= dateNow.getTime()) {
+                return res.status(406).send({
+                    status: "error",
+                    message: "La fecha ingresada no es válida"
+                });
+            }
+
+            //Buscar en el modelo de reserva por la id de usuario y fecha ingresada 
+            Reserva.find({ usuario: params.usuario, fechaReserva: params.fechaReserva }, (error, reserva) => {
+
+                //Si el usuario registra una reserva donde ya tiene registrada una reserva se activara esta validacion
+                if (reserva.length === 1) {
+
+                    return res.status(400).send({
+                        status: "error",
+                        message: "Ya registra una reserva para la fecha y hora seleccionada"
+                    });
+
+                }
+
+                //Validacion de disponibilidad de maquinas en la hora ingresada
+                mantencion.countDocuments({ fechaIni: { "$lte": params.fechaReserva }, fechaFin: { "$gte": params.fechaReserva } }, (err, cantMantenciones) => {
+
+                    maquina.countDocuments({ tipo: params.tipo }, (error, cantMaquinas) => {
+
+                        Reserva.countDocuments({ fechaReserva: params.fechaReserva, tipo: params.tipo }, (error, cantReservas) => {
+
+                            if (cantMaquinas - cantMantenciones <= cantReservas) {
+
                                 return res.status(400).send({
                                     status: "error",
-                                    message: "No tiene permisos para modificar esta reserva"
+                                    message: "No hay máquinas disponibles para la fecha y hora seleccionada"
                                 });
+
                             }
 
-                            //En caso de que el usuario ingresado no exista
-                            if(!user){
-                                return res.status(406).send({
-                                    status: "error",
-                                    message: "El usuario ingresado no existe"
-                                });
-                            }
-                    
-                            //Buscar por id y actualizar la reserva
-                            Reserva.findByIdAndUpdate(id, params, (error, reservation) => {
-                    
-                                //En caso de error
-                                if (error) {
+                            //Buscar usuario por parametro de usuario
+                            User.findOne({ _id: params.usuario }, (error, user) => {
+
+                                //Validacion de si esta autorizado
+                                if (user.autorizado == "No") {
                                     return res.status(400).send({
                                         status: "error",
-                                        message: "Ha ocurrido un error al actualizar la reserva, inténtelo nuevamente"
+                                        message: "No tiene permisos para modificar esta reserva"
                                     });
                                 }
 
-                                //En caso de que no exita la reserva que se quiere modificar
-                                if(!reservation){
+                                //En caso de que el usuario ingresado no exista
+                                if (!user) {
                                     return res.status(406).send({
                                         status: "error",
-                                        message: "No hay reserva que modificar"
+                                        message: "El usuario ingresado no existe"
                                     });
                                 }
-                    
-                                //Constantes para un email de modificacion
-                                const message = "Estimado cliente se le informa que se ha realizado con éxito la modificación de la reserva en nuestra lavandería para la nueva fecha ";
-                                const token = process.env.PW;
-                                const mail = "servicio.lavanderia2022@gmail.com";
-                                let hora = date.getHours()+3;
-                    
-                                //Creacion del transporter de nodemailer
-                                const transporter = nodemailer.createTransport({
-                                    host: 'smtp.gmail.com',
-                                    port: 465,
-                                    secure: true,
-                                    auth: {
-                                        user: mail,
-                                        pass: token
+
+                                //Buscar por id y actualizar la reserva
+                                Reserva.findByIdAndUpdate(id, params, (error, reservation) => {
+
+                                    //En caso de error
+                                    if (error) {
+                                        return res.status(400).send({
+                                            status: "error",
+                                            message: "Ha ocurrido un error al actualizar la reserva, inténtelo nuevamente"
+                                        });
                                     }
+
+                                    //En caso de que no exita la reserva que se quiere modificar
+                                    if (!reservation) {
+                                        return res.status(406).send({
+                                            status: "error",
+                                            message: "No hay reserva que modificar"
+                                        });
+                                    }
+
+                                    //Constantes para un email de modificacion
+                                    const message = "Estimado cliente se le informa que se ha realizado con éxito la modificación de la reserva en nuestra lavandería para la nueva fecha ";
+                                    const token = process.env.PW;
+                                    const mail = "servicio.lavanderia2022@gmail.com";
+                                    let hora = date.getHours() + 3;
+
+                                    //Creacion del transporter de nodemailer
+                                    const transporter = nodemailer.createTransport({
+                                        host: 'smtp.gmail.com',
+                                        port: 465,
+                                        secure: true,
+                                        auth: {
+                                            user: mail,
+                                            pass: token
+                                        }
+                                    });
+
+                                    //Cuerpo del email
+                                    const mailOptions = {
+                                        from: "Administración <" + mail + ">",
+                                        to: user.email,
+                                        subject: "Modificación de reserva",
+                                        html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
+                                    }
+
+                                    //Enviar email sobre la modificacion
+                                    transporter.sendMail(mailOptions);
+
+                                    //Devolver resultado de exito
+                                    return res.status(200).send({
+                                        status: "success",
+                                        message: "Se ha actualizado correctamente la reserva",
+                                        reservation: reservation
+                                    });
+
                                 });
-                    
-                                //Cuerpo del email
-                                const mailOptions = {
-                                    from: "Administración <" + mail + ">",
-                                    to: user.email,
-                                    subject: "Modificación de reserva",
-                                    html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
-                                }
-                    
-                                //Enviar email sobre la modificacion
-                                transporter.sendMail(mailOptions);
-                    
-                                //Devolver resultado de exito
-                                return res.status(200).send({
-                                    status: "success",
-                                    message: "Se ha actualizado correctamente la reserva",
-                                    reservation: reservation
-                                });
-                    
+
                             });
-                    
+
                         });
-        
+
                     });
-        
+
                 });
-        
+
             });
 
-        }); 
+        });
 
-    });   
+    });
 
 }
 
@@ -327,7 +340,7 @@ const deleteReservation = (req, res) => {
     Reserva.findOne({ _id: id }, (error, reserva) => {
 
         //En caso de no encontrar ninguna reserva a eliminar
-        if(!reserva){
+        if (!reserva) {
             return res.status(406).send({
                 status: "error",
                 message: "La reserva a eliminar no existe"
@@ -342,7 +355,7 @@ const deleteReservation = (req, res) => {
         let dateNow = new Date();
 
         //Validacion de si la reserva que desea eliminar se encuentra dentro del rango permitido de fecha
-        if(date <= dateNow){
+        if (date <= dateNow) {
             return res.status(406).send({
                 status: "error",
                 message: "La reserva no puede ser eliminada debido a que ya paso"
@@ -373,7 +386,7 @@ const deleteReservation = (req, res) => {
                 from: "Administración <" + mail + ">",
                 to: user.email,
                 subject: "Cancelación de reserva",
-                html: "<h3>"+message+"</h3>"
+                html: "<h3>" + message + "</h3>"
             }
 
             //Se envia email
@@ -401,10 +414,10 @@ const viewReservations = (req, res) => {
     let id = req.params.id;
 
     //Se obtienen reservas por la id del usuario 
-    Reserva.find({usuario:id}, (error, reservations) => {
+    Reserva.find({ usuario: id }, (error, reservations) => {
 
         //En caso de error
-        if(error){
+        if (error) {
             return res.status(400).send({
                 status: "error",
                 message: "No se han encontrado reservas"
@@ -412,7 +425,7 @@ const viewReservations = (req, res) => {
         }
 
         //En caso de que no haya reservar para mostrar
-        if(reservations.length == 0){
+        if (reservations.length == 0) {
             return res.status(400).send({
                 status: "error",
                 message: "No se han encontrado reservas"
@@ -434,10 +447,10 @@ const viewReservations = (req, res) => {
 const viewAllReservations = (req, res) => {
 
     //Se obtienen todas las reservas registradas
-    Reserva.find((error, reservations) => {
+    Reserva.find({}).populate('usuario').exec((error, reservations) => {
 
         //En caso de error
-        if(error){
+        if (error) {
             return res.status(400).send({
                 status: "error",
                 message: "No se han encontrado reservas"
@@ -445,7 +458,7 @@ const viewAllReservations = (req, res) => {
         }
 
         //En caso de que no haya reservar para mostrar
-        if(reservations.length == 0){
+        if (reservations.length == 0) {
             return res.status(400).send({
                 status: "error",
                 message: "No se han encontrado reservas"
@@ -458,7 +471,32 @@ const viewAllReservations = (req, res) => {
             message: "Se encontraron las siguientes reservas",
             reservations: reservations
         });
-        
+
+    });
+
+}
+
+//Listo (administrador)
+const deleteReservations = (req, res) => {
+
+    //Se recoge id de la reserva a eliminar por la url
+    let id = req.params.id;
+
+    //Se busca la reserva por la id y se elimina
+    Reserva.findByIdAndDelete(id, (error, reservation) => {
+
+        if (error) {
+            return res.status(400).send({
+                status: "error",
+                message: "No se ha podido eliminar la reserva"
+            });
+        }
+
+        return res.status(200).send({
+            status: "success",
+            message: "Se ha eliminado la reserva con éxito"
+        });
+
     });
 
 }
@@ -468,5 +506,6 @@ module.exports = {
     updateReservation,
     deleteReservation,
     viewReservations,
-    viewAllReservations
+    viewAllReservations,
+    deleteReservations
 }
