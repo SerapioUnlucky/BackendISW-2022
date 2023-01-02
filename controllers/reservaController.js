@@ -21,7 +21,7 @@ const createReservation = (req, res) => {
     //Validacion de fechas validas
     let date = new Date(params.fechaReserva);
     let hora = date.getHours();
-    date.setHours(hora+3, 0, 0, 0);
+    //date.setHours(hora+3, 0, 0, 0);
     let dateNow = new Date();
 
     if (hora < 8 || hora > 21) {
