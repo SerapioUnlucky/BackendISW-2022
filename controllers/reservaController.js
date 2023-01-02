@@ -187,7 +187,7 @@ const updateReservation = (req, res) => {
             let date = new Date(fecha.fechaReserva);
             let dateNow = new Date();
             let hora = date.getHours();
-            //date.setHours(hora+3, 0, 0, 0);
+            date.setHours(hora-3, 0, 0, 0);
 
             if (date < dateNow) {
                 return res.status(406).send({
