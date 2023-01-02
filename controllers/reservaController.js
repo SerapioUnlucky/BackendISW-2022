@@ -170,6 +170,12 @@ const updateReservation = (req, res) => {
 
     }
 
+    //Validacion de fechas validas
+    let date = new Date(fecha.fechaReserva);
+    let hora = date.getHours();
+    date.setHours(hora, 0, 0, 0);
+    let dateNow = new Date();
+
     //Buscar en el modelo de usuario si existe el usuario ingresado
     User.exists({ _id: params.usuario }, (error, usuarioExistente) => {
 
@@ -182,12 +188,6 @@ const updateReservation = (req, res) => {
         }
 
         Reserva.findById(id, (error, fecha) => {
-
-            //Validacion de fechas validas
-            let date = new Date(fecha.fechaReserva);
-            let hora = date.getHours();
-            date.setHours(hora, 0, 0, 0);
-            let dateNow = new Date();
 
             if (date < dateNow) {
                 return res.status(406).send({
@@ -299,7 +299,7 @@ const updateReservation = (req, res) => {
                                         from: "Administración <" + mail + ">",
                                         to: user.email,
                                         subject: "Modificación de reserva",
-                                        html: "<h3>" + message + date.toLocaleDateString() + " a las  " + date.getHours()-1 + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
+                                        html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                                     }
 
                                     //Enviar email sobre la modificacion
