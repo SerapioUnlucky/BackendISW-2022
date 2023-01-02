@@ -185,8 +185,8 @@ const updateReservation = (req, res) => {
 
             //Validacion de fechas validas
             let date = new Date(fecha.fechaReserva);
-            date.setHours(hora, 0, 0, 0);
             let hora = date.getHours();
+            date.setHours(hora, 0, 0, 0);
             let dateNow = new Date();
 
             if (date < dateNow) {
@@ -299,7 +299,7 @@ const updateReservation = (req, res) => {
                                         from: "Administración <" + mail + ">",
                                         to: user.email,
                                         subject: "Modificación de reserva",
-                                        html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
+                                        html: "<h3>" + message + date.toLocaleString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                                     }
 
                                     //Enviar email sobre la modificacion
