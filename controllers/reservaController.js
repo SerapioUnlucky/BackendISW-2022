@@ -185,9 +185,9 @@ const updateReservation = (req, res) => {
 
             //Validacion de fechas validas
             let date = new Date(fecha.fechaReserva);
-            let dateNow = new Date();
             let hora = date.getHours();
             date.setHours(hora, 0, 0, 0);
+            let dateNow = new Date();
 
             if (date < dateNow) {
                 return res.status(406).send({
