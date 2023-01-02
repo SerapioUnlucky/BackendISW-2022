@@ -299,7 +299,7 @@ const updateReservation = (req, res) => {
                                         from: "Administración <" + mail + ">",
                                         to: user.email,
                                         subject: "Modificación de reserva",
-                                        html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
+                                        html: "<h3>" + message + date.toLocaleDateString() + " a las  " + date.getHours() + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                                     }
 
                                     //Enviar email sobre la modificacion
