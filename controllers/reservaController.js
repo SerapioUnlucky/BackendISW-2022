@@ -24,8 +24,6 @@ const createReservation = (req, res) => {
     date.setHours(hora, 0, 0, 0);
     let dateNow = new Date();
 
-    console.log(hora);
-
     if (hora < 8 || hora > 21) {
         return res.status(406).send({
             status: "error",
@@ -126,7 +124,7 @@ const createReservation = (req, res) => {
                                     from: "Administración <" + mail + ">",
                                     to: user.email,
                                     subject: "Notificación de reserva",
-                                    html: "<h3>" + message + date.toLocaleDateString() + " a las  " + hora + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
+                                    html: "<h3>" + message + date.toLocaleDateString() + " a las  " + date.getHours() + " horas " + ", el tipo de servicio a usar es " + params.tipo + "</h3>"
                                 }
 
                                 //Enviar email
