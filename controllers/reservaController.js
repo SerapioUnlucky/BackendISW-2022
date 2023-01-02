@@ -24,6 +24,8 @@ const createReservation = (req, res) => {
     date.setHours(hora, 0, 0, 0);
     let dateNow = new Date();
 
+    console.log(hora);
+
     if (hora < 8 || hora > 21) {
         return res.status(406).send({
             status: "error",
@@ -170,6 +172,12 @@ const updateReservation = (req, res) => {
 
     }
 
+    //Validacion de fechas validas
+    let date = new Date(params.fechaReserva);
+    let hora = date.getHours();
+    date.setHours(hora, 0, 0, 0);
+    let dateNow = new Date();
+
     //Buscar en el modelo de usuario si existe el usuario ingresado
     User.exists({ _id: params.usuario }, (error, usuarioExistente) => {
 
@@ -183,13 +191,9 @@ const updateReservation = (req, res) => {
 
         Reserva.findById(id, (error, fecha) => {
 
-            //Validacion de fechas validas
-            let date = new Date(fecha.fechaReserva);
-            let hora = date.getHours();
-            date.setHours(hora, 0, 0, 0);
-            let dateNow = new Date();
+            let dateR = new Date(fecha.fechaReserva);
 
-            if (date < dateNow) {
+            if (dateR < dateNow) {
                 return res.status(406).send({
                     status: "error",
                     message: "Esta reserva no se puede modificar ya que la fecha de la reserva es anterior a la fecha actual"
