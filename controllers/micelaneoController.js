@@ -23,7 +23,11 @@ const generarInforme = (req,res) => {
     fechaFina.setMonth(fechaReque.getMonth()+1);
     fechaFina.setDate(0);
 
-    if (fechaReque.getTime()>fecha.getTime()){//!AGREGAR IGUAL "="
+    let postpasado = new Date();
+    postpasado.setMonth(postpasado.getMonth() +2);
+    postpasado.setDate(0);
+
+    if (fechaReque.getTime()>postpasado.getTime()){
         return res.status(406).send({message:"La fecha ingresada no es válida"})
     }
     
